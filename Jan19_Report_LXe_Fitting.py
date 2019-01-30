@@ -98,12 +98,12 @@ s9_lowp_75 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_27_55.txt")
 # s9_medp2_60 = Run(path + "Sample 9 medium pressure 2\\2018_12_07__14_25_38.txt") 
 # s9_medp2_67 = Run(path + "Sample 9 medium pressure 2\\2018_12_07__14_20_48.txt")
 # s9_medp2_75 = Run(path + "Sample 9 medium pressure 2\\2018_12_07__14_14_47.txt") 
-# s9_hip_30 = Run(path + "Sample 9 higher pressure\\2018_12_05__17_33_42.txt")
-# s9_hip_45 = Run(path + "Sample 9 higher pressure\\2018_12_05__17_28_40.txt")
-# s9_hip_52 = Run(path + "Sample 9 higher pressure\\2018_12_05__17_19_59.txt")
-# s9_hip_60 = Run(path + "Sample 9 higher pressure\\2018_12_05__17_15_21.txt") 
-# s9_hip_67 = Run(path + "Sample 9 higher pressure\\2018_12_05__17_10_17.txt")
-# s9_hip_75 = Run(path + "Sample 9 higher pressure\\2018_12_05__17_03_53.txt") 
+s9_hip_30 = Run(path + "Sample 9 higher pressure\\2018_12_05__17_33_42.txt")
+s9_hip_45 = Run(path + "Sample 9 higher pressure\\2018_12_05__17_28_40.txt")
+s9_hip_52 = Run(path + "Sample 9 higher pressure\\2018_12_05__17_19_59.txt")
+s9_hip_60 = Run(path + "Sample 9 higher pressure\\2018_12_05__17_15_21.txt") 
+s9_hip_67 = Run(path + "Sample 9 higher pressure\\2018_12_05__17_10_17.txt")
+s9_hip_75 = Run(path + "Sample 9 higher pressure\\2018_12_05__17_03_53.txt") 
 # s9_hip2_30 = Run(path + "Sample 9 higher pressure 2\\2018_12_07__16_59_52.txt")
 # s9_hip2_45 = Run(path + "Sample 9 higher pressure 2\\2018_12_07__16_55_11.txt")
 # s9_hip2_52 = Run(path + "Sample 9 higher pressure 2\\2018_12_07__16_50_31.txt")
@@ -123,7 +123,7 @@ labels=["30 degrees","45 degrees","52 degrees","60 degrees", "67 degrees", "75 d
 
 # Plot BRIDF data
 sample_name="LZ Skived"
-plot_runs(runs, title=sample_name+" in 0.2 barg LXe, 178 nm", log=True, labels=labels, include_legend=False, errorbars=True, legend_loc=0)
+plot_runs(runs, title=sample_name+" in 0.2 barg LXe, 178 nm", log=True, labels=labels, include_legend=True, errorbars=True, legend_loc=0)
 # plt.text(0.88,0.88,r"$75^{\circ}$",transform=plt.gca().transAxes,fontsize=13) # Positions for s9 low_p
 # plt.text(0.85,0.78,r"$67^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
 # plt.text(0.8,0.62,r"$60^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
@@ -145,14 +145,23 @@ plot_runs(runs, title=sample_name+" in 0.2 barg LXe, 178 nm", log=True, labels=l
 t0=time.time()
 
 # Fit data
+# tmp = np.array([[1,2],[3,4]])
+# tmp2 = list(tmp)
+# print(tmp,tmp2)
 # tmp1=np.arange(10)
 # tmp2=np.arange(4,14)
 # print(tmp1,tmp2,np.linspace(tmp1,tmp2,1))
-fit_params = fit_parameters(get_independent_variables_and_relative_intensities(runs),p0=[0.99,1.54,.15],average_angle=4, precision=.25, sigma_theta_i=-1., use_errs=True,use_spike=False,bounds=([0.5,1.4,0.04],[1.2,1.8,0.3]))#[0.5,1.4,0.04,5.0],[1.2,1.8,0.3,50.]#[0.5,1.4,0.1],[1.0,1.8,0.3]#[0.01,1.01,0.05],[2.0,3.0,0.5]
+fit_params = fit_parameters(get_independent_variables_and_relative_intensities(runs),p0=[0.99,1.54,.15],average_angle=4, precision=.25, sigma_theta_i=2., use_errs=True,use_spike=False,bounds=([0.5,1.4,0.04],[1.2,1.8,0.3]))#[0.5,1.4,0.04,5.0],[1.2,1.8,0.3,50.]#[0.5,1.4,0.1],[1.0,1.8,0.3]#[0.01,1.01,0.05],[2.0,3.0,0.5]
 #fit_params_ang = fit_parameters_and_angle(get_independent_variables_and_relative_intensities(runs),average_angle=4.)
 #fit_ang = fit_params_ang[0]
 #fit_params = fit_params_ang[1:]
-#fit_params=[1.013, 1.560, 0.0857]#[0.784,1.568,0.144]#[0.86,1.50,0.07]#[0.72,1.45,0.2]#[0.800,1.581,0.157]#
+#fit_params= [0.68114103391512837, 1.6259581862678401, 0.11282346636450034, 8.5642437795248174]#[0.947, 1.555, 0.091]#[0.784,1.568,0.144]#[0.86,1.50,0.07]#[0.72,1.45,0.2]#[0.800,1.581,0.157]#
+# Fitter params for s9 in vacuum after LXe, 2.15 solid angle
+fit_params_vacuum=[0.68114103391512837, 1.6259581862678401, 0.11282346636450034, 8.5642437795248174]
+# Fitter parameters for s9 in LXe, 2.15 solid angle factor, Lorentz model
+fit_params_lowp=[0.9466040398353657, 1.5542353537306548, 0.09079476300181971]
+fit_params_hip=[0.9871481402574648, 1.5715034469520426, 0.09586940402324681]
+#fit_params=fit_params_lowp
 # # Fitted parameters for s9 2.44 solid angle factor
 # fit_params_lowp=[0.784,1.568,0.144]
 # fit_params_lowp2=[0.892,1.563,0.176]
@@ -169,11 +178,11 @@ print("Fitting time: {0}".format(t1-t0))
 
 # Plot BRIDF model from fits
 n_LXe_178 = 1.69
-sigma_theta_i=-1#2.
+sigma_theta_i=2.
 precision=0.25
 average_angle=4
 #plot_TSTR_fit(20., n_LXe_178, fit_params, color="r", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-plot_TSTR_fit(30., n_LXe_178, fit_params, label="fitted", color="r", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(30., n_LXe_178, fit_params, color="r", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
 plot_TSTR_fit(45., n_LXe_178, fit_params, color="g", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
 plot_TSTR_fit(52., n_LXe_178, fit_params, color="b", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
 plot_TSTR_fit(60., n_LXe_178, fit_params, color="m", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
@@ -194,8 +203,8 @@ print("Plotting time: {0}".format(t2-t1))
 # Now calculate hemispherical reflectance
 # plt.figure()
 
-# # Different incident angles to calculate for
-# x = [0,5]#[0,10,20,30, 45.1, 55, 60, 65, 70, 75, 80, 85]#[0,30,45.1,60,70,75,80,85]#[5,60,70,80]#[5,30, 45, 60, 70, 75, 80, 85]#[0,10,20,30, 45, 55, 60, 65, 70, 75, 80, 85]#
+# Different incident angles to calculate for
+x = [0,10,20,30, 45.1, 55, 60, 65, 70, 75, 80, 85]#[0,30,45.1,60,70,75,80,85]#[5,60,70,80]#[5,30, 45, 60, 70, 75, 80, 85]#[0,10,20,30, 45, 55, 60, 65, 70, 75, 80, 85]#
 
 # y_diffuse = [reflectance_diffuse(theta, n_LXe_178, 0.5, fit_params) for theta in x]
 # y_specular = [reflectance_specular(theta, n_LXe_178, 0.5, fit_params) for theta in x]
@@ -204,11 +213,23 @@ print("Plotting time: {0}".format(t2-t1))
 # print("Diffuse reflectances: ",y_diffuse)
 # print("Specular reflectances: ",y_specular)
 
-# # x_full=x[:]
-# # x_full.append(90)
-# # print(x, x_full)
-# # sin_th = np.array([np.sin(xx*np.pi/180.) for xx in x_full])
-# # d_th = np.array([10,10,10,15,10,5,5,5,5,5,5,5])*np.pi/180.
+x_full=x[:]
+x_full.append(90)
+sin_th = np.array([np.sin(xx*np.pi/180.) for xx in x_full])
+d_th = np.array([10,10,10,15,10,5,5,5,5,5,5,5])*np.pi/180.
+y_diffuse_vacuum_after=[0.5578751171383803, 0.5578645143005274, 0.5576939575569828, 0.5568501861704306, 0.551086564170089, 0.538862412662774, 0.5268697521170906, 0.5079125730733413, 0.4778737783402822, 0.4298921339077521, 0.3520995149402873, 0.22288077539943185]
+y_specular_vacuum_after= [0.055008024656618325, 0.05518586897714156, 0.055937258940607706, 0.05802618505411558, 0.06795857669468221, 0.08518472501034707, 0.10042656606592987, 0.1230381756764488, 0.15759182167624392, 0.21483421777180697, 0.32793108506231394, 0.6332518225200205]
+y_specular_vacuum_after=[min(x[0],1-x[1]) for x in zip(y_specular_vacuum_after,y_diffuse_vacuum_after)]
+y_total_vacuum_after = [sum(x) for x in zip(y_specular_vacuum_after,y_diffuse_vacuum_after)]
+y_total_vacuum_after_full = y_total_vacuum_after[:]
+y_total_vacuum_after_full.append(y_total_vacuum_after[-1])
+y_total_vacuum_after_full=np.array(y_total_vacuum_after_full)
+y_sky_vacuum_after_right = np.sum(sin_th[1:]*d_th*y_total_vacuum_after_full[1:])
+y_sky_vacuum_after_left = np.sum(sin_th[:-1]*d_th*y_total_vacuum_after_full[:-1])
+y_sky_vacuum_after_mid = np.sum((sin_th[:-1]+sin_th[1:])/2*d_th*(y_total_vacuum_after_full[:-1]+y_total_vacuum_after_full[1:])/2)
+print("White sky reflectance, vacuum after, low est: ",y_sky_vacuum_after_left)
+print("White sky reflectance, vacuum after, high est: ",y_sky_vacuum_after_right)
+print("White sky reflectance, vacuum after, middle est: ",y_sky_vacuum_after_mid)
 # # y_diffuse_vacuum_before=[0.45766348181118743, 0.4580440040036757, 0.45840578569295093, 0.458373743496906, 0.45519279945081914, 0.4467776090150314, 0.4382352346643636, 0.42459365404619115, 0.4030226445070669, 0.3691595655515466, 0.31672576341572695, 0.23997195829098059]
 # # y_specular_vacuum_before=[0.06255417549996851, 0.06265684345501554, 0.06321515540210665, 0.06512830173742697, 0.07570232176333869, 0.09608785701329016, 0.11458965758798859, 0.14207103191906068, 0.1823613281476766, 0.240653361837574, 0.3259507169947907, 0.4865190393937654]
 # # y_total_vacuum_before = [sum(x) for x in zip(y_specular_vacuum_before,y_diffuse_vacuum_before)]
@@ -218,42 +239,60 @@ print("Plotting time: {0}".format(t2-t1))
 # # y_sky_vacuum_before_left = np.sum(sin_th[:-1]*d_th*y_total_vacuum_before_full[:-1])
 # # print("White sky reflectance, vacuum before, low est: ",y_sky_vacuum_before_left)
 # # print("White sky reflectance, vacuum before, high est: ",y_sky_vacuum_before_right)
-# # y_diffuse_LXe_lowp=[0.6570412916757591, 0.6579357341415137, 0.6591016792259574, 0.6606138318516783, 0.6633688576680011, 0.6626957378115929, 0.6549616061782121, 0.6062281312066095, 0.0, 0.0, 0.0, 0.0]
-# # y_specular_LXe_lowp= [0.0014054544422652119, 0.0014218233642250282, 0.0015141490462703899, 0.0018695965399099326, 0.0057283880366878585, 0.03827531730547219, 0.09984977500055535, 0.25165997130973317, 0.5000189208911733, 0.6960823791225147, 0.8249335365771578, 1.0]#1.0750904931429557]
-# # y_total_LXe_lowp = [sum(x) for x in zip(y_specular_LXe_lowp,y_diffuse_LXe_lowp)]
-# # y_total_LXe_lowp_full = y_total_LXe_lowp[:]
-# # y_total_LXe_lowp_full.append(y_total_LXe_lowp[-1])
-# # y_sky_LXe_lowp_right = np.sum(sin_th[1:]*d_th*y_total_LXe_lowp_full[1:])
-# # y_sky_LXe_lowp_left = np.sum(sin_th[:-1]*d_th*y_total_LXe_lowp_full[:-1])
-# # print("White sky reflectance, LXe 0.2 barg, low est: ",y_sky_LXe_lowp_left)
-# # print("White sky reflectance, LXe 0.2 barg, high est: ",y_sky_LXe_lowp_right)
+# # y_diffuse_LXe_lowp_old=[0.6570412916757591, 0.6579357341415137, 0.6591016792259574, 0.6606138318516783, 0.6633688576680011, 0.6626957378115929, 0.6549616061782121, 0.6062281312066095, 0.0, 0.0, 0.0, 0.0]
+# # y_specular_LXe_lowp_old= [0.0014054544422652119, 0.0014218233642250282, 0.0015141490462703899, 0.0018695965399099326, 0.0057283880366878585, 0.03827531730547219, 0.09984977500055535, 0.25165997130973317, 0.5000189208911733, 0.6960823791225147, 0.8249335365771578, 1.0]#1.0750904931429557]
+y_diffuse_LXe_lowp=[0.7982997601321108, 0.7982673604741001, 0.7982065233759797, 0.7980038464847359, 0.7960858935743564, 0.7874156102421991, 0.7676760751881307, 0.6532634974917723, 0.23652460596145553, 0.13341800718215685, 0.08127525337984297, 0.05402807309618492]
+y_specular_LXe_lowp=[0.0017852149063135958, 0.001818308226244964, 0.0019795301316915003, 0.002543034835696333, 0.009548179713833347, 0.053554449148170015, 0.11833288201197621, 0.2823038620542749, 0.5406700804638772, 0.6790627367772443, 0.798665136503454, 1.0700312085436152]
+y_specular_LXe_lowp=[min(x[0],1-x[1]) for x in zip(y_specular_LXe_lowp,y_diffuse_LXe_lowp)]
+y_total_LXe_lowp = [sum(x) for x in zip(y_specular_LXe_lowp,y_diffuse_LXe_lowp)]
+y_total_LXe_lowp_full = y_total_LXe_lowp[:]
+y_total_LXe_lowp_full.append(y_total_LXe_lowp[-1])
+y_total_LXe_lowp_full=np.array(y_total_LXe_lowp_full)
+y_sky_LXe_lowp_right = np.sum(sin_th[1:]*d_th*y_total_LXe_lowp_full[1:])
+y_sky_LXe_lowp_left = np.sum(sin_th[:-1]*d_th*y_total_LXe_lowp_full[:-1])
+y_sky_LXe_lowp_mid = np.sum((sin_th[:-1]+sin_th[1:])/2*d_th*(y_total_LXe_lowp_full[:-1]+y_total_LXe_lowp_full[1:])/2)
+print("White sky reflectance, LXe 0.2 barg, low est: ",y_sky_LXe_lowp_left)
+print("White sky reflectance, LXe 0.2 barg, high est: ",y_sky_LXe_lowp_right)
+print("White sky reflectance, LXe 0.2 barg, middle est: ",y_sky_LXe_lowp_mid)
 # # y_diffuse_LXe_lowp2= [0.7402398286291142, 0.7417007202832876, 0.7436238363017107, 0.7461638687993092, 0.7512130151093066, 0.752163989934962, 0.7433876636862394, 0.6765365007371161, 0.0, 0.0, 0.0, 0.0]
 # # y_specular_LXe_lowp2= [0.001527762931549758, 0.0015516293860655497, 0.0016747374647144962, 0.0021276141278918324, 0.007227369888786746, 0.04961757416725003, 0.11917259018207207, 0.2626128326744476, 0.4667668545228056, 0.6430628471896185, 0.7907470379047791, 1.0]#1.0997835008723356]
 # # y_total_LXe_lowp2 = [sum(x) for x in zip(y_specular_LXe_lowp2,y_diffuse_LXe_lowp2)]
-# # y_diffuse_LXe_hip= [0.6829307222870662, 0.6840336258528498, 0.6854793518118913, 0.6873917251376706, 0.6913214705135405, 0.6930010462636261, 0.6892947926267271, 0.6618038165708974, 0.0, 0.0, 0.0, 0.0]
-# # y_specular_LXe_hip= [0.001112165427732242, 0.0011263277428219362, 0.00120284458242256, 0.0014878128453774913, 0.00431818948159568, 0.028577408166662696, 0.0767039434227785, 0.1938216373997157, 0.40704522413508704, 0.6172302526293288, 0.7723284466198603, 1.0]#1.047912122232299]
-# # y_total_LXe_hip = [sum(x) for x in zip(y_specular_LXe_hip,y_diffuse_LXe_hip)]
+# # y_diffuse_LXe_hip_old= [0.6829307222870662, 0.6840336258528498, 0.6854793518118913, 0.6873917251376706, 0.6913214705135405, 0.6930010462636261, 0.6892947926267271, 0.6618038165708974, 0.0, 0.0, 0.0, 0.0]
+# # y_specular_LXe_hip_old= [0.001112165427732242, 0.0011263277428219362, 0.00120284458242256, 0.0014878128453774913, 0.00431818948159568, 0.028577408166662696, 0.0767039434227785, 0.1938216373997157, 0.40704522413508704, 0.6172302526293288, 0.7723284466198603, 1.0]#1.047912122232299]
+y_diffuse_LXe_hip= [0.8491875929406879, 0.8491509762266888, 0.8490914075177584, 0.8489201262096208, 0.8474340080642626, 0.8411375534056131, 0.8279556472564547, 0.7687016503469466, 0.3323357823672721, 0.16558390232400014, 0.10476839339443421, 0.06534115759627902]
+y_specular_LXe_hip= [0.0013400522898790678, 0.0013641072780542977, 0.001480245806814926, 0.0018772752465937084, 0.005731975904048718, 0.036692820567370533, 0.0848219866352421, 0.2022403891367498, 0.4541913398256783, 0.6259906120320465, 0.7543231293523422, 1.0211097366859878]
+y_specular_LXe_hip=[min(x[0],1-x[1]) for x in zip(y_specular_LXe_hip,y_diffuse_LXe_hip)]
+y_total_LXe_hip = [sum(x) for x in zip(y_specular_LXe_hip,y_diffuse_LXe_hip)]
+y_total_LXe_hip_full = y_total_LXe_hip[:]
+y_total_LXe_hip_full.append(y_total_LXe_hip[-1])
+y_total_LXe_hip_full=np.array(y_total_LXe_hip_full)
+y_sky_LXe_hip_right = np.sum(sin_th[1:]*d_th*y_total_LXe_hip_full[1:])
+y_sky_LXe_hip_left = np.sum(sin_th[:-1]*d_th*y_total_LXe_hip_full[:-1])
+y_sky_LXe_hip_mid = np.sum((sin_th[:-1]+sin_th[1:])/2*d_th*(y_total_LXe_hip_full[:-1]+y_total_LXe_hip_full[1:])/2)
+print("White sky reflectance, LXe 1.45 barg, low est: ",y_sky_LXe_hip_left)
+print("White sky reflectance, LXe 1.45 barg, high est: ",y_sky_LXe_hip_right)
+print("White sky reflectance, LXe 1.45 barg, middle est: ",y_sky_LXe_hip_mid)
 # # y_diffuse_LXe_hip2= [0.7116527697234036, 0.7138323922133201, 0.7167431409327432, 0.7206668394297263, 0.729091743241813, 0.7335885883463384, 0.7262823707645063, 0.6474078491699706, 0.0, 0.0, 0.0, 0.0]
 # # y_specular_LXe_hip2=  [0.0016528720786998794, 0.0016884735251564945, 0.001857732976822431, 0.0024483848517261844, 0.009600045662265523, 0.06251613539473333, 0.13418304588129548, 0.25679333990263276, 0.4159533052261603, 0.5728408076108408, 0.7414240888009019, 1.0]#1.1194372218351034]
 # # y_total_LXe_hip2 = [sum(x) for x in zip(y_specular_LXe_hip2,y_diffuse_LXe_hip2)]
 
-# plt.plot(x, y_diffuse, label="diffuse")
-# plt.plot(x, y_specular, label="specular")
-# plt.plot(x, y_total, label="total")
-# # plt.plot(x, y_specular_vacuum_before, label="specular, vacuum",linestyle='-',color='y')
-# # plt.plot(x, y_specular_LXe_lowp, label="specular, 0.2 barg LXe",linestyle='-.',color='y')
+# # plt.plot(x, y_diffuse, label="diffuse")
+# # plt.plot(x, y_specular, label="specular")
+# # plt.plot(x, y_total, label="total")
+# plt.plot(x, y_specular_vacuum_after, label="specular, vacuum",linestyle='-',color='y')
+# plt.plot(x, y_specular_LXe_lowp, label="specular, 0.2 barg LXe",linestyle='-.',color='y')
 # # #plt.plot(x, y_specular_LXe_lowp2, label="spec_lowp2")
-# # plt.plot(x, y_specular_LXe_hip, label="specular, 1.45 barg LXe",linestyle='--',color='y')
+# plt.plot(x, y_specular_LXe_hip, label="specular, 1.45 barg LXe",linestyle='--',color='y')
 # # #plt.plot(x, y_specular_LXe_hip2, label="spec_hip2")
-# # plt.plot(x, y_diffuse_vacuum_before, label="diffuse, vacuum",linestyle='-',color='c')
-# # plt.plot(x, y_diffuse_LXe_lowp, label="diffuse, 0.2 barg LXe",linestyle='-.',color='c')
+# plt.plot(x, y_diffuse_vacuum_after, label="diffuse, vacuum",linestyle='-',color='c')
+# plt.plot(x, y_diffuse_LXe_lowp, label="diffuse, 0.2 barg LXe",linestyle='-.',color='c')
 # # #plt.plot(x, y_diffuse_LXe_lowp2, label="diff_lowp2")
-# # #plt.plot(x, y_diffuse_LXe_hip, label="diffuse, 1.45 barg LXe",linestyle='--',color='c')
+# # # plt.plot(x, y_diffuse_LXe_hip, label="diffuse, 1.45 barg LXe",linestyle='--',color='c')
 # # #plt.plot(x, y_diffuse_LXe_hip2, label="diff_hip2")
-# # plt.plot(x, y_total_vacuum_before, label="total, vacuum",linestyle='-',color='b')
-# # plt.plot(x, y_total_LXe_lowp, label="total, 0.2 barg LXe",linestyle='-.',color='b')
+# plt.plot(x, y_total_vacuum_after, label="total, vacuum",linestyle='-',color='b')
+# plt.plot(x, y_total_LXe_lowp, label="total, 0.2 barg LXe",linestyle='-.',color='b')
 # # #plt.plot(x, y_total_LXe_lowp2, label="total_lowp2")
-# # #plt.plot(x, y_total_LXe_hip, label="total, 1.45 barg LXe",linestyle='--',color='b')
+# # # plt.plot(x, y_total_LXe_hip, label="total, 1.45 barg LXe",linestyle='--',color='b')
 # # #plt.plot(x, y_total_LXe_hip2, label="total_hip2")
 # # # Line styles: '-', '--', '-.', ':'
 

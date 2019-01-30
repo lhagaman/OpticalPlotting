@@ -229,7 +229,12 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
     # def P(alpha_):
         # gamma_prime = gamma/2 # scale so that this gamma is similar to gamma in CT and TR distributions
         # return (1.3981*gamma_prime+0.13) / (np.pi*gamma_prime**2*(1+(np.tan(alpha_)/gamma_prime)**2))
-				
+			
+    # Bivariate-Cauchy distribution, from Claudio; distribution is normalized
+    # def P(alpha_):
+        # gamma_prime = gamma*0.74 # scale so that this gamma is similar to gamma in CT and TR distributions
+        # return gamma_prime*(gamma_prime+1)/(2*np.pi*np.cos(alpha_)**3*(gamma_prime**2+np.tan(alpha_)**2)**(3/2))
+			
     # Check probably unnecessary; if cos errors pop up, will have to fix to work for arrays 
     # if theta_i == theta_r:
         # alpha_specular = 0
@@ -245,7 +250,6 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
 	
     # Wolff correction factor, p. 114 of thesis; uses global angles
 	# Breaking up into two parts: incident Fresnel factor (always scalar since theta_i is) and outgoing (can be an array)
-	# ! Try using local angle for part of this? Requires adding an integral...
 	# First deal w/ incident angle part of W: W=0 if theta_i > theta_crit = arcsin(n/n0) and n0>n; fraction making through should be integral of P*G*W
 	# but N is already integral of P*G; fraction of angles below theta_crit is integral of P(alpha)*sin(alpha)*cos(alpha)*dalpha*dphi_alpha
 	# 1-F(theta_i) is very close to 1 below theta_crit, so can just use integral above (skip G)
@@ -258,15 +262,17 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
 	#		sum up P(alpha)*sin(alpha)*cos(alpha)*dalpha*dphi_alpha for alpha in range [alpha_crit, pi/2]
 	# Add up all sums
     def W_crit(theta, theta_c, polarization=0.5, n_phi_alpha=25, n_alpha=100): 
-		# Running w/ theta as a vector:
-		# phi_alpha_m will be a vector, no problems (one value for each theta)
-		# phi_alpha_range: will linspace work on vector inputs?
-		# phi_alpha should be a 1D array (single value for each theta, iterating through the list of values in phi_alpha_range)
-		# alpha_range must be a numpy array (can be 2D)
+		# Assumes theta is a scalar
         phi_alpha_m = phi_alpha_max(theta, theta_c) # Max phi_alpha where there is an angle alpha that can give theta_prime<theta_crit
         dphi_alpha = np.pi/n_phi_alpha
         d_alpha = np.pi/2/n_alpha
-        phi_alpha_range = np.linspace(-phi_alpha_m,phi_alpha_m,round(2*phi_alpha_m/dphi_alpha))
+        n_phi=round(2*phi_alpha_m/dphi_alpha)
+        # if np.size(theta)>1:
+            # phi_alpha_range = [np.linspace(-phi_i,phi_i,n_phi) for phi_i in phi_alpha_m]#= np.empty((np.size(theta),n_phi))
+            # for ii in arange(np.size(theta)):
+                # phi_alpha_range[ii,:] = np.linspace(-phi_alpha_m,phi_alpha_m,n_phi)
+        # else:
+        phi_alpha_range = np.linspace(-phi_alpha_m,phi_alpha_m,n_phi)
         #print(dphi_alpha, phi_alpha_range[1]-phi_alpha_range[0])
         W_sum = 0
         for phi_alpha in phi_alpha_range:
@@ -280,39 +286,49 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
 	
 	# Incident part of W, W_i
     if np.size(theta_i) > 1:
-        W_i = 1 - F(theta_i, n_0, n, polarization)
+        # W_i = 1 - F(theta_i, n_0, n, polarization) # Use this if skipping W_crit calculation 
+        theta_i_mean = np.mean(theta_i)
+        if n_0 > n and np.abs(n_0 / n * np.sin(theta_i_mean)) >= 1: # Above critical angle, just calculate W_crit for average angle
+            theta_crit = np.arcsin(n/n_0)
+            W_i = W_crit(theta_i_mean, theta_crit, polarization)
+        else:
+            W_i = 1 - F(theta_i, n_0, n, polarization) # could speed up using theta_i_mean
     else:
         if n_0 > n and np.abs(n_0 / n * np.sin(theta_i)) >= 1:
             theta_crit = np.arcsin(n/n_0)
             W_i = W_crit(theta_i, theta_crit, polarization)
-            #if theta_r < 1*np.pi/180: print("W_i: ",W_i)
             #W_i = 1 - F(theta_i, n_0, n, polarization)
         else:
-           W_i = 1 - F(theta_i, n_0, n, polarization)
+           W_i = 1 - F(theta_i, n_0, n, polarization) 
 	
     # Operating on masked arrays is slow; only use them if needed (inputs are arrays)
     if np.size(theta_r) > 1: # Have to use masks
-        mask = np.abs(n_0 / n * np.sin(theta_r)) >= 1
-        theta_r_mask = np.ma.masked_array(theta_r, mask)
-        W_o = (1 - F_unpolarized(np.ma.arcsin(n_0 / n * np.sin(theta_r_mask)), n, n_0))
-        W_o = np.ma.filled(W_o, fill_value=0)
+        theta_r_mean = np.mean(theta_r)
+        if n_0 > n and np.abs(n_0 / n * np.sin(theta_r_mean)) >= 1: # Above critical angle, just calculate W_crit for average angle
+            theta_crit = np.arcsin(n/n_0)
+            W_o = W_crit(theta_r_mean, theta_crit, polarization=0.5)
+        else:
+            mask = np.abs(n_0 / n * np.sin(theta_r)) >= 1
+            theta_r_mask = np.ma.masked_array(theta_r, mask)
+            W_o = (1 - F_unpolarized(np.ma.arcsin(n_0 / n * np.sin(theta_r_mask)), n, n_0))
+            W_o = np.ma.filled(W_o, fill_value=0)
     else:
-		# Could try to do all calcs at once: 
-		# If any theta_i or theta_r > theta_crit: calculate P*sin*cos*dalpha*dphi_alpha for full range of alphas
-		# Then W_o is sum of masked values (1-F, masked to 0 if above critical; integral, masked to 0 if below critical)
-		# Does this save time? calc happens only once for theta_i; many times for theta_r if above critical
-		# Maybe have one section for theta_i (doesn't check size), then if statement for theta_r
-		# Uses masks for theta_r if size>1
+		# theta_r is a single value
         if n_0 > n and np.abs(n_0 / n * np.sin(theta_r)) >= 1:
 			# the W expression would have an arcsin error
             theta_crit = np.arcsin(n/n_0)
-            W_o = W_crit(theta_r, theta_crit, polarization=polarization) 
+            W_o = W_crit(theta_r, theta_crit, polarization=0.5) 
+            #print("W_o critical calculation")
             #W_o = 0
         else:
             # There was a typo here (?), I changed by moving parentheses and taking a reciprocal
             W_o = (1 - F_unpolarized(np.arcsin(n_0 / n * np.sin(theta_r)), n, n_0))
     W = W_i*W_o 
 
+    # def omega(n,n_p,th): # Solid angle factor from beams expanding due to Snell's law
+        # return np.cos(th)/np.sqrt(1-(n_p/n)**2*np.sin(th)**2)	
+    # W=W*omega(n,n_0,theta_r)
+	
     # theta_r_list = np.linspace(0.,np.pi/2,102)
     # #W_list = [(1 - F(theta_i, n_0, n, polarization)) * (1 - F_unpolarized(np.arcsin(n_0 / n * np.sin(t_r)), n, n_0)) for t_r in theta_r_list]
     # W_list = [(1 - F_unpolarized(np.arcsin(n_0 / n * np.sin(t_r)), n, n_0)) for t_r in theta_r_list]
@@ -355,7 +371,7 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
 			
     # Oren-Nayar correction factor(s) (1-A+B)*cos(theta_i);
     # From p. 8 of arXiv:0910.1056v1 (Reflectance of PTFE for Xenon Scintillation Light), using Torrance-Sparrow (not Trowbridge-Reitz)
-    # (For comparizon, Claudio's thesis p. 117 has Oren-Nayar correction factor, N, for Trowbridge-Reitz)
+    # (For comparison, Claudio's thesis p. 117 has Oren-Nayar correction factor, N, for Trowbridge-Reitz)
     theta_m = np.minimum(theta_i, theta_r)
 
     theta_M = np.maximum(theta_i, theta_r)
@@ -605,7 +621,7 @@ def fitter_with_angle(independent_variables_without_angle_array, theta_i, log_rh
 # if sigma_theta_i is positive and doing a 2D average in theta_r, phi_r, sets Gaussian sigma for smearing in incident angle
 # use_errs sets whether to use the run's relative_std values to weight the fitting by or to use uniform errors
 # use_spike sets whether to include the specular spike in the BRIDF model
-def fit_parameters(independent_variables_array_intensity_array, p0=[0.5, 1.5, 0.05], average_angle=0, precision=-1, sigma_theta_i=-1, use_errs=True, use_spike=False, bounds=(-np.inf, np.inf)):
+def fit_parameters(independent_variables_array_intensity_array, p0=[0.5, 1.5, 0.05], average_angle=0, precision=-1, sigma_theta_i=-1, use_errs=True, use_spike=False, bounds=([-np.inf],[np.inf])):
     independent_variables_array = independent_variables_array_intensity_array[0]
     independent_variables_array = [list+[sigma_theta_i,precision,average_angle] for list in independent_variables_array]
     #print(independent_variables_array)
@@ -758,6 +774,8 @@ def reflectance_diffuse(theta_i_in_degrees, n_0, polarization, parameters):
 
     a = lambda x: 0 # Limits for theta_r
     b = lambda x: np.pi / 2
+    if n_0 > parameters[1]:
+        th_crit = lambda x: np.arcsin(parameters[1]/n_0)
 
     def BRIDF_int(theta_r, phi_r):
         # solid angle not used here
@@ -772,10 +790,26 @@ def reflectance_diffuse(theta_i_in_degrees, n_0, polarization, parameters):
     # plt.plot(theta_r_list,BRIDF_list )
     # plt.plot(theta_r_list,G_list )
     # plt.show()
-    integral_results = scipy.integrate.dblquad(BRIDF_int, -np.pi, np.pi, a, b)
+    if n_0 > parameters[1]: # If we have total internal reflection, break up integral into part below and above critical angle
+        # int_1d=scipy.integrate.quad(BRIDF_int,0,np.pi/2,0,full_output=1,epsrel=1e-5,epsabs=1e-5,limit=10)[0]*2*np.pi
+        # print("Integral based off of phi_r=0: ",int_1d)
+        integral_results_below = scipy.integrate.dblquad(BRIDF_int, -np.pi, np.pi, a, th_crit)
+        #integral_results_above = scipy.integrate.dblquad(BRIDF_int, -np.pi, np.pi, th_crit_plus, b) #dblquad doesn't like W_crit
+        phi_r_list = np.linspace(-np.pi,np.pi,30) # Not a strong function of phi_r, so few points are needed
+        d_phi = np.pi*2/30
+        one_d_int_results_above = [scipy.integrate.quad(BRIDF_int,np.arcsin(parameters[1]/n_0),np.pi/2,phi,full_output=1,epsrel=1e-5,epsabs=1e-5,limit=10) for phi in phi_r_list]
+        one_d_ints_above = [int_result[0] for int_result in one_d_int_results_above]
+        #print("Integrals for each slice in phi_r: ", one_d_ints_above)
+        # print("Number of function evaluations in first integral: ",one_d_int_results_above[0][2]['neval'])
+        # print("Number of subintervals: ",one_d_int_results_above[0][2]['last'])
+        sum_integral_above = sum(one_d_ints_above)*d_phi
+        integral = integral_results_below[0] + sum_integral_above# + integral_results_above[0]
+    else:
+        integral_results = scipy.integrate.dblquad(BRIDF_int, -np.pi, np.pi, a, b)
+        integral = integral_results[0]
     #print("2D integral result: ",integral_results[0])
     #print("2D integral error: ",integral_results[1])
-    return integral_results[0]
+    return integral
 
 # Calculates diffuse hemispherical reflectance for a given incident angle
 # Note that specular lobe depends on whether specular spike is included or not

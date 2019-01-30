@@ -93,6 +93,7 @@ def plot_runs(runs, title=False, rot=False, voltage=False, labels=False, label=F
 	else:
 		plt.ylim(0, 1.1 * maxy)
 	plt.xlim(minx, maxx)
+	#plt.ylim(1e-3,1e2)
 	if title:
 		plt.title(title)
 	if include_legend:

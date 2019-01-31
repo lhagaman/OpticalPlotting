@@ -1,9 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-path = "/Users/leehagaman/Desktop/OpticalPlotting/"
-#path = "C:\\Users\\swkra\\OneDrive\\Documents\\GitHub\\OpticalPlotting\\"
-#path = "/global/homes/r/rjsmith/OpticalPlotting/"
+are_you_lee = True
+are_you_ryan = False
+are_you_scott = False
+
+if are_you_lee:
+	path = "/Users/leehagaman/Desktop/OpticalPlotting/"
+elif are_you_scott:
+	path = "C:\\Users\\swkra\\OneDrive\\Documents\\GitHub\\OpticalPlotting\\"
+elif are_you_ryan:
+	path = "/global/homes/r/rjsmith/OpticalPlotting/"
 beam_bkg_filename = "Vacuum measurements after 3rd xenon run/Jan 14/Background/500nm/2019_01_14__15_54_21.txt"
 beam_bkg_file = open(path + beam_bkg_filename)
 
@@ -16,7 +23,10 @@ class Run:
 		# chosen to be slightly less than lowest rate during background measurement in LXe
 		# Have been using 70 for 1st/2nd run LXe data at 178 nm, 150 for vacuum data at 178/175 nm
 		self.incidentpower = float(lines[8][16:-1])
-		beam_bkg_filename = "First Xe Run Measurements\\first measurements with no bubbles in cell 11-01-2\\Initial power and background at 178 nm\\2018_11_01__14_56_35.txt" #background with beam on goes here 
+		if are_you_scott:
+			beam_bkg_filename = "First Xe Run Measurements\\first measurements with no bubbles in cell 11-01-2\\Initial power and background at 178 nm\\2018_11_01__14_56_35.txt" #background with beam on goes here 
+		else:
+			beam_bkg_filename = "First Xe Run Measurements/first measurements with no bubbles in cell 11-01-2/Initial power and background at 178 nm/2018_11_01__14_56_35.txt" #background with beam on goes here 
 		#"Vacuum measurements after 3rd xenon run/Jan 14/Background/500nm/2019_01_14__15_54_21.txt"
 		beam_bkg_file = open(path + beam_bkg_filename)
 		beam_bkg_lines = beam_bkg_file.readlines()
@@ -66,7 +76,7 @@ class Run:
 		self.relative_intensities = [intensity*intensity_factor(self.incidentpower) for intensity in self.intensities]
 		const_err = 100 # error to add to std from e.g. error on background; using 300 for 1st/2nd run LXe data at 178 nm, 100 for vacuum at 178/175 nm
 		self.relative_std = [(std+const_err)*intensity_factor(self.incidentpower) for std in self.intensity_std]
-		frac_err = 0# fraction of each reading to add as an error in quadrature
+		frac_err = 0.05# fraction of each reading to add as an error in quadrature
 		self.std_pct = [frac_err*rel_int for rel_int in self.relative_intensities]
 		self.relative_std = list(np.sqrt(np.array(self.std_pct)**2+np.array(self.relative_std)**2))
 
@@ -78,10 +88,15 @@ class Run:
 			self.n = 1.69
 			# from https://arxiv.org/pdf/physics/0307044
 		
-		# angles_below_cutoff = np.where(np.array(self.angles) < 80.)
-		# self.angles = np.array(self.angles)[angles_below_cutoff]
-		# self.intensities = np.array(self.intensities)[angles_below_cutoff]
-		# self.intensity_std = np.array(self.intensity_std)[angles_below_cutoff]
+		# this section changes the angle range
+		"""
+		angles_below_cutoff = np.where(np.array(self.angles) < 70.)
+		self.angles = np.array(self.angles)[angles_below_cutoff]
+		self.intensities = np.array(self.intensities)[angles_below_cutoff]
+		self.intensity_std = np.array(self.intensity_std)[angles_below_cutoff]
+		self.relative_std = np.array(self.relative_std)[angles_below_cutoff]
+		self.relative_intensities = np.array(self.relative_intensities)[angles_below_cutoff]
+		"""
 			
 		# independent_variables_array is a list where each element is of the form [theta_r_in_degrees, phi_r_in_degrees, theta_i_in_degrees, n_0, polarization]
 		self.independent_variables_array = [[angle, 0, self.incidentangle, self.n, 0.5] for angle in self.angles]

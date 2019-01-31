@@ -214,10 +214,10 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
     theta_r_prime = theta_prime
 
     # Trowbridge-Reitz micro-facet angle distribution, p. 88 of Claudio's thesis; normalized w/o shadowing/masking factor G in integral
-    def P(alpha_):
-        return np.power(gamma, 2) / \
-               (np.pi * np.power(np.cos(alpha_), 4) *
-                np.power(np.power(gamma, 2) + np.power(np.tan(alpha_), 2), 2))
+    # def P(alpha_):
+        # return np.power(gamma, 2) / \
+               # (np.pi * np.power(np.cos(alpha_), 4) *
+               # np.power(np.power(gamma, 2) + np.power(np.tan(alpha_), 2), 2))
 
     # Cook-Torrance distribution, p. 87
     # def P(alpha_):
@@ -231,9 +231,9 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
         # return (1.3981*gamma_prime+0.13) / (np.pi*gamma_prime**2*(1+(np.tan(alpha_)/gamma_prime)**2))
 			
     # Bivariate-Cauchy distribution, from Claudio; distribution is normalized
-    # def P(alpha_):
-        # gamma_prime = gamma*0.74 # scale so that this gamma is similar to gamma in CT and TR distributions
-        # return gamma_prime*(gamma_prime+1)/(2*np.pi*np.cos(alpha_)**3*(gamma_prime**2+np.tan(alpha_)**2)**(3/2))
+    def P(alpha_):
+        gamma_prime = gamma*0.74 # scale so that this gamma is similar to gamma in CT and TR distributions
+        return gamma_prime*(gamma_prime+1)/(2*np.pi*np.cos(alpha_)**3*(gamma_prime**2+np.tan(alpha_)**2)**(3/2))
 			
     # Check probably unnecessary; if cos errors pop up, will have to fix to work for arrays 
     # if theta_i == theta_r:

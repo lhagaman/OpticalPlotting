@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-are_you_lee = True
+are_you_lee = False
 are_you_ryan = False
-are_you_scott = False
+are_you_scott = True
 
 if are_you_lee:
 	path = "/Users/leehagaman/Desktop/OpticalPlotting/"
@@ -24,7 +24,8 @@ class Run:
 		# Have been using 70 for 1st/2nd run LXe data at 178 nm, 150 for vacuum data at 178/175 nm
 		self.incidentpower = float(lines[8][16:-1])
 		if are_you_scott:
-			beam_bkg_filename = "First Xe Run Measurements\\first measurements with no bubbles in cell 11-01-2\\Initial power and background at 178 nm\\2018_11_01__14_56_35.txt" #background with beam on goes here 
+			beam_bkg_filename = "3rd Xenon Run Measurements\\Power and background at 178 nm\\2018_12_21__12_51_57.txt" #background with beam on goes here 
+			# "First Xe Run Measurements\\first measurements with no bubbles in cell 11-01-2\\Initial power and background at 178 nm\\2018_11_01__14_56_35.txt"
 		else:
 			beam_bkg_filename = "First Xe Run Measurements/first measurements with no bubbles in cell 11-01-2/Initial power and background at 178 nm/2018_11_01__14_56_35.txt" #background with beam on goes here 
 		#"Vacuum measurements after 3rd xenon run/Jan 14/Background/500nm/2019_01_14__15_54_21.txt"
@@ -39,10 +40,12 @@ class Run:
 		# dark_bkg_data = np.loadtxt(dark_bkg_filename,skiprows = 12)
 		# self.dark_bkg_intensities = np.array([datum[1] for datum in dark_bkg_data])
 		# self.dark_bkg_angles = np.array([datum[0] for datum in dark_bkg_data])
+		# self.dark_bkg_intensities=200
+		# bkg_scaling=1.0	
 		bkg = self.beam_bkg_intensities*(self.incidentpower/self.beam_bkg_incidentpower)
 		#self.dark_bkg_intensities #use this to subtract background with beam off
-        #(self.beam_bkg_intensities-self.dark_bkg_intensities)*(self.incidentpower/self.beam_bkg_incidentpower) +self.dark_bkg_intensities
-        #use above to subtract total background 
+		#(self.beam_bkg_intensities-self.dark_bkg_intensities)*(self.incidentpower/self.beam_bkg_incidentpower)*bkg_scaling +self.dark_bkg_intensities
+        #use above to subtract total background, with separate dark background and beam background scaled by bkg_scaling
 		self.angles = [datum[0] for datum in data]
 		self.incidentangle = float(lines[7][16:-1])
 		self.bkg = []        
@@ -55,9 +58,9 @@ class Run:
 			self.intensities = intensitylist
 		else:
 			self.intensities = [datum[1]-flat_bkg for datum in data]
-#		for i in range(len(self.intensities)):
-#			if self.intensities[i]<0:
-#				self.intensities[i] = 1
+		for i in range(len(self.intensities)):
+			if self.intensities[i]<0:
+				self.intensities[i] = 1
 		self.intensity_std = [datum[2] for datum in data]
 		
 		
@@ -157,14 +160,13 @@ def incident_power_factor_function(mirror_incident_angle_and_filename_list):
 
 def intensity_factor(incidentpower):
 	
-	# Angular diameter is arcsin(0.385"/5.4") = 4.1 deg; to get to angular radius of 2.44 for same aperture, distance must be ~4.5" (~4.35" for 2.54)
-	# Remeasured, got 0.385-0.390" aperture, ~5.2" distance = 4.3 degrees (2.15 degrees radius)
+	# Remeasured, got 0.385-0.390" aperture, 5.48-5.52" distance = 4.00-4.08 degrees (2.00-2.04 degrees radius)
 	# Spectralon calibrated reflectance: 0.9745 at 400 nm, 0.9784 at 500 nm; index is listed as 1.35 (no wavelength specified...)
 	# fit to data matches this for angular_radius of 2.67 (400 nm), 2.68 (500 nm) when using bkg of 50, err of 50
 	# for 400 nm, bkg of 500, err of 100 (closer match to background measurement at 405 nm, similar power), get 2.44
 	# for 500 nm, bkg of 100, err of 100 (closer match to bkg at 500 nm when scaled by power, but taken a month later), get 2.61
 	# for 500 nm, bkg of 150, err of 100 (background at 405 nm from same day, but scaled by power), get 2.54
-	photodiode_angular_radius = 2.15 #degrees; old plots used 4.0 incorrectly
+	photodiode_angular_radius = 2.00 #degrees; old plots used 4.0 incorrectly
 	photodiode_angular_size = photodiode_angular_radius * np.pi / 180.
 
 	photodiode_solid_angle = np.pi * np.power(photodiode_angular_size, 2)

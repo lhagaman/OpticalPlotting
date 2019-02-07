@@ -547,7 +547,7 @@ def average_BRIDF(independent_variables, log_rho_L, log_n_minus_one, log_gamma, 
         #theta_i_prime = np.repeat(theta_i, n_rand)
         #delta_theta_i = np.random.normal(scale=sigma_theta_i, size=n_rand)
         eps=0.0001
-        delta_theta_i = np.linspace(-3 * sigma_theta_i-eps,sigma_theta_i * 3+eps,n_rand) # offset by eps to avoid errors related to floating point precision
+        delta_theta_i = np.linspace(-2 * sigma_theta_i-eps,sigma_theta_i * 2+eps,n_rand) # offset by eps to avoid errors related to floating point precision
         #print(delta_theta_i)
         theta_i = theta_i+delta_theta_i
     

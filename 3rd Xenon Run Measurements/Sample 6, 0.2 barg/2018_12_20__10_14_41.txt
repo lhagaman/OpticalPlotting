@@ -1,0 +1,20 @@
+Data Saved Successfully
+Date and Time: 2018_12_20__10_14_41
+Name: 807NX, 45 deg, 0.2 barg
+Description: reflectivity measurements on 807NX sample; pressure back to 0.2 barg; using dial at 85 for 45 deg; slit opened further to 1.19, PMT height 0.95", aperture 0.385"
+Substance: LXe
+Sample ID: 6
+Preamp Sensitivity: 100.000000
+Incident Angle: 45.000000
+Incident Power: 1024640.000000
+Wavelength: 178.000000
+Temperature: 181.500000
+Pressure: 0.190000
+85.000000	293.801308	10.047132
+84.000000	312.526590	6.681866
+83.000000	354.124174	7.343060
+82.000000	378.760049	8.794192
+81.000000	427.700281	6.878404
+80.000000	12.033709	59.315744
+79.000000	12.033709	0.000000
+78.000000	12.033709	0.000000

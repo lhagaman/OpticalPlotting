@@ -51,7 +51,7 @@ def F_s(theta_i, n_0, n):
 def F_s_single(theta_i, n_0, n):
     if np.abs(n_0 / n * np.sin(theta_i)) > 1:
         # total internal reflection
-        return 1
+        return 1.
     theta_t = np.arcsin(n_0 / n * np.sin(theta_i))
     return np.power((n_0 * np.cos(theta_i) - n * np.cos(theta_t)) /
                     (n_0 * np.cos(theta_i) + n * np.cos(theta_t)), 2)
@@ -67,7 +67,7 @@ def F_s_array(theta_i, n_0, n):
     F_calc = np.power((n_0 * np.cos(theta_i) - n * np.cos(theta_t)) /
                     (n_0 * np.cos(theta_i) + n * np.cos(theta_t)), 2)
     #print(F_calc)
-    return np.ma.filled(F_calc,fill_value=1)
+    return np.ma.filled(F_calc,fill_value=1.)
 
 def F_p(theta_i, n_0, n):
     if np.size(theta_i)>1: return F_p_array(theta_i, n_0, n)
@@ -77,7 +77,7 @@ def F_p(theta_i, n_0, n):
 def F_p_single(theta_i, n_0, n):
     if np.abs(n_0 / n * np.sin(theta_i)) > 1:
         # total internal reflection
-        return 1
+        return 1.
     theta_t = np.arcsin(n_0 / n * np.sin(theta_i))
     return np.power((n_0 * np.cos(theta_t) - n * np.cos(theta_i)) /
                     (n_0 * np.cos(theta_t) + n * np.cos(theta_i)), 2)
@@ -95,7 +95,7 @@ def F_p_array(theta_i, n_0, n):
     F_calc = np.power((n_0 * np.cos(theta_t) - n * np.cos(theta_i)) /
                     (n_0 * np.cos(theta_t) + n * np.cos(theta_i)), 2)
     #print(type(F_calc))
-    return np.ma.filled(F_calc,fill_value=1)
+    return np.ma.filled(F_calc,fill_value=1.)
 
 
 def F_unpolarized(theta_i, n_0, n):
@@ -105,6 +105,59 @@ def F_unpolarized(theta_i, n_0, n):
 def F(theta_i, n_0, n, polarization):
     return polarization * F_p(theta_i, n_0, n) + (1 - polarization) * F_s(theta_i, n_0, n)
 
+
+# this is a model for the fresnel factor which uses a uniform range of n values, from n - n_range / 2 to n + n_range / 2
+# the range is split into two parts, the part which does not totally internally reflect, and the part which does
+# the part that does totally internally reflect is simple to calculate perfectly
+# the part that does not is approximated by being represented by the center n value for the range
+
+n_range = 0.001
+
+# assumes unpolarized light
+# takes in a masked array only including where total internal reflection doesn't happen
+# uses algebra to avoid taking the sin and cosines of an arcsin
+def F_single(theta_i, n_0, n):
+    c = np.cos(theta_i)
+    s = np.sin(theta_i)
+    n_ratio = n_0 / n
+    s_reflection = np.ma.power((n_0 * c - n * np.real(np.emath.sqrt(1 - n_ratio * n_ratio * s * s))) / 
+                               (n_0 * c + n * np.real(np.emath.sqrt(1 - n_ratio * n_ratio * s * s))), 2)
+    p_reflection = np.ma.power((n_0 * np.real(np.emath.sqrt(1 - n_ratio * n_ratio * s * s)) - n * c) / 
+                               (n_0 * np.real(np.emath.sqrt(1 - n_ratio * n_ratio * s * s)) + n * c), 2)
+    
+    return 0.5 * (s_reflection + p_reflection)
+
+def F_single_no_internal(theta_i, n_0, n, polarization):
+    c = np.cos(theta_i)
+    s = np.sin(theta_i)
+    n_ratio = n_0 / n
+    s_reflection = np.power((n_0 * c - n * np.sqrt(1 - n_ratio * n_ratio * s * s)) / 
+                               (n_0 * c + n * np.sqrt(1 - n_ratio * n_ratio * s * s)), 2)
+    p_reflection = np.power((n_0 * np.sqrt(1 - n_ratio * n_ratio * s * s) - n * c) / 
+                               (n_0 * np.sqrt(1 - n_ratio * n_ratio * s * s) + n * c), 2)
+    
+    return (1-polarization) * s_reflection + polarization * p_reflection
+
+# takes in an array of theta_i values
+def F(theta_i, n_0, n, polarization=0.5):
+    n_crit = n_0 * np.sin(theta_i)
+    # if n is less than n_crit, then there is TIR
+
+    n_min_tir = n - n_range / 2.
+    n_max_non_tir = n + n_range / 2.
+    n_boundary_tir = np.maximum(n_min_tir, np.minimum(n_crit, n_max_non_tir)) # ideally n_crit, but forced to be bounded by the n range
+    n_center_no_tir = (n_max_non_tir + n_boundary_tir) / 2.
+    all_tir = n_center_no_tir < n_crit # array of booleans; true if full range has TIR
+    n_center_no_tir = n_center_no_tir*np.logical_not(all_tir)+n_0*all_tir # replaces n_center w/ n_0 if all_tir is true
+    
+    tir_frac = (n_boundary_tir - n_min_tir) / n_range # gives fraction of n values which cause TIR
+
+    non_tir_frac = 1. - tir_frac
+    non_tir_array = F_single_no_internal(theta_i, n_0, n_center_no_tir, polarization)* non_tir_frac # multiplies fresnel factor by fraction of n values represented by n_center
+    return np.add(tir_frac, non_tir_array)
+
+def F_unpolarized(theta_i, n_0, n):
+    return F(theta_i, n_0, n, 0.5)
 
 # heaviside step function
 def H(x):
@@ -340,7 +393,7 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
 			
 	# Shadowing and masking, for Trowbridge-Reitz distribution; p. 108 of thesis
     def G_prime(theta):
-        return 2 / (1 + np.sqrt(1 + np.power(gamma * np.tan(theta), 2)))
+        return 2. / (1. + np.sqrt(1 + np.power(gamma * np.tan(theta), 2)))
 			
     # Shadowing and masking, for Cook-Torrance (also called Beckman?) distribution
 	# From eq. 4.80, p. 108 of thesis, itself taken from https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.pdf
@@ -365,7 +418,16 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
     # this has negative of the inside of the H functions from the paper, I think it was a typo
     G = H(np.pi / 2 - theta_i_prime) * H(np.pi / 2 - theta_r_prime) * \
         G_prime(theta_i) * G_prime(theta_r)
-			
+
+    """
+    # added by Lee 2/4/2019 to try to smooth out 54 degree fits at high reflected angles
+    # this messed up the high angles too much, would not recommend using
+    def G_prime_spec(theta):
+        return 1. / (1. + np.exp(10. * (theta - 70. * np.pi / 180.))) 
+    # this has negative of the inside of the H functions from the paper, I think it was a typo
+    G = H(np.pi / 2 - theta_i_prime) * H(np.pi / 2 - theta_r_prime) * \
+        G_prime_spec(theta_i) * G_prime_spec(theta_r)
+	"""
     t3=time.time()
     #print("G calculation time: {0}".format(t3-t2))
 			

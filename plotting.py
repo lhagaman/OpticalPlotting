@@ -88,7 +88,7 @@ def plot_runs(runs, title=False, rot=False, voltage=False, labels=False, label=F
 		else:
 			plt.ylabel("intensity (reflected rate/str)/(incident rate)")
 	if log:
-		plt.ylim(0.5 * miny, 5. * maxy)
+		plt.ylim(0.5 * np.max([miny, 0.001]), 5. * maxy)
 		plt.yscale("log")
 	else:
 		plt.ylim(0, 1.1 * maxy)
@@ -123,10 +123,9 @@ def plot_TSTR_fit(theta_i, n, fit_params, label="", color="", average_angle=0, p
 		plt.plot(x, BRIDF_plotter(x, phi_r, theta_i, n, 0.5, fit_params, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i), color=color)
 	if include_fit_text:
 		if len(fit_params) == 3:
-			plt.text(0.05,0.05 + fit_text_offset, fit_text + r"$\rho_L$={0:.3f}, n={1:.2f}, $\gamma$={2:.3f}".format(*fit_params),transform=plt.gca().transAxes,fontsize=13)
+			plt.text(0.05,0.05 + fit_text_offset, fit_text + r"$\rho_L$={0:.4f}, n={1:.4f}, $\gamma$={2:.4f}".format(*fit_params),transform=plt.gca().transAxes,fontsize=13)
 		else:
-			plt.text(0.05,0.05 + fit_text_offset, fit_text + r"$\rho_L$={0:.3f}, n={1:.2f}, $\gamma$={2:.3f}, K={3:.3f}".format(*fit_params),transform=plt.gca().transAxes,fontsize=13)
-
+			plt.text(0.05,0.05 + fit_text_offset, fit_text + r"$\rho_L$={0:.4f}, n={1:.4f}, $\gamma$={2:.4f}, K={3:.4f}".format(*fit_params),transform=plt.gca().transAxes,fontsize=13)
 	plt.legend()
 
 """fit_params=["rho_L_1","n_1","gamma_1","K_1",

@@ -102,7 +102,6 @@ def F(theta_i, n_0, n, polarization=0.5):
     non_tir_array = F_single_no_internal(theta_i, n_0, n_center_no_tir, polarization)* non_tir_frac # multiplies fresnel factor by fraction of n values represented by n_center
     return np.add(tir_frac, non_tir_array)
 
-    
 # heaviside step function
 def H(x):
     return 0.5 * (np.sign(x) + 1)
@@ -339,8 +338,8 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
             
     # Shadowing and masking, for Trowbridge-Reitz distribution; p. 108 of thesis
     def G_prime(theta):
-        return 2 / (1 + np.sqrt(1 + np.power(gamma * np.tan(theta), 2)))
-            
+        return 2. / (1. + np.sqrt(1 + np.power(gamma * np.tan(theta), 2)))
+			
     # Shadowing and masking, for Cook-Torrance (also called Beckman?) distribution
     # From eq. 4.80, p. 108 of thesis, itself taken from https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.pdf
     # def G_prime(theta):
@@ -364,7 +363,17 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
     # this has negative of the inside of the H functions from the paper, I think it was a typo
     G = H(np.pi / 2 - theta_i_prime) * H(np.pi / 2 - theta_r_prime) * \
         G_prime(theta_i) * G_prime(theta_r)
-            
+
+    """
+    # added by Lee 2/4/2019 to try to smooth out 54 degree fits at high reflected angles
+    # this messed up the high angles too much, would not recommend using
+    def G_prime_spec(theta):
+        return 1. / (1. + np.exp(10. * (theta - 70. * np.pi / 180.))) 
+    # this has negative of the inside of the H functions from the paper, I think it was a typo
+    G = H(np.pi / 2 - theta_i_prime) * H(np.pi / 2 - theta_r_prime) * \
+        G_prime_spec(theta_i) * G_prime_spec(theta_r)
+	"""
+
     t3=time.time()
             
     # Oren-Nayar correction factor(s) (1-A+B)*cos(theta_i);

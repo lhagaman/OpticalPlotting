@@ -19,8 +19,13 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.colors
 
 # following equations could be refined for mu !~ mu_0, but teflon has mu~mu_0
-
-
+time_w1=0
+time_w2=0
+time_wtot=0
+time_G=0
+time_N=0
+time_F=0
+    
 # this function is used in calculating the total reflectance
 def G_calc(theta_r, phi_r, theta_i, n_0, polarization, parameters):
     rho_L = parameters[0]
@@ -43,69 +48,61 @@ def G_calc(theta_r, phi_r, theta_i, n_0, polarization, parameters):
 
     return G
 
-def F_s(theta_i, n_0, n):
-    if np.size(theta_i)>1: return F_s_array(theta_i, n_0, n)
-    else: return F_s_single(theta_i, n_0, n)
-    
-# polarized electric field perpendicular to plane of incidence (vertical)
-def F_s_single(theta_i, n_0, n):
-    if np.abs(n_0 / n * np.sin(theta_i)) > 1:
-        # total internal reflection
-        return 1
-    theta_t = np.arcsin(n_0 / n * np.sin(theta_i))
-    return np.power((n_0 * np.cos(theta_i) - n * np.cos(theta_t)) /
-                    (n_0 * np.cos(theta_i) + n * np.cos(theta_t)), 2)
-    
-# polarized electric field perpendicular to plane of incidence (vertical)
-# designed to work when theta_i is an array; more efficient for arrays, but much 
-# slower for single values due to masked arrays being slow
-def F_s_array(theta_i, n_0, n):
-    mask = np.abs(n_0 / n * np.sin(theta_i)) > 1
-    #print(type(mask))
-    theta_i_mask = np.ma.masked_array(theta_i, mask)
-    theta_t = np.ma.arcsin(n_0 / n * np.sin(theta_i_mask))
-    F_calc = np.power((n_0 * np.cos(theta_i) - n * np.cos(theta_t)) /
-                    (n_0 * np.cos(theta_i) + n * np.cos(theta_t)), 2)
-    #print(F_calc)
-    return np.ma.filled(F_calc,fill_value=1)
-
-def F_p(theta_i, n_0, n):
-    if np.size(theta_i)>1: return F_p_array(theta_i, n_0, n)
-    else: return F_p_single(theta_i, n_0, n)
-    
-# polarized electric field parallel to plane of incidence (horizontal)
-def F_p_single(theta_i, n_0, n):
-    if np.abs(n_0 / n * np.sin(theta_i)) > 1:
-        # total internal reflection
-        return 1
-    theta_t = np.arcsin(n_0 / n * np.sin(theta_i))
-    return np.power((n_0 * np.cos(theta_t) - n * np.cos(theta_i)) /
-                    (n_0 * np.cos(theta_t) + n * np.cos(theta_i)), 2)
-
-# polarized electric field parallel to plane of incidence (horizontal)
-# designed to work when theta_i is an array; more efficient for arrays, but much 
-# slower for single values due to masked arrays being slow
-def F_p_array(theta_i, n_0, n):
-    # Have to check for arcsin errors; using masked array to handle multiple theta_i values
-    mask = np.abs(n_0 / n * np.sin(theta_i)) > 1
-    #print(type(mask))
-    theta_i_mask = np.ma.masked_array(theta_i, mask)
-    theta_t = np.ma.arcsin(n_0 / n * np.sin(theta_i_mask))
-    #print(type(theta_t))
-    F_calc = np.power((n_0 * np.cos(theta_t) - n * np.cos(theta_i)) /
-                    (n_0 * np.cos(theta_t) + n * np.cos(theta_i)), 2)
-    #print(type(F_calc))
-    return np.ma.filled(F_calc,fill_value=1)
-
-
 def F_unpolarized(theta_i, n_0, n):
-    return 0.5 * (F_s(theta_i, n_0, n) + F_p(theta_i, n_0, n))
+    return F(theta_i, n_0, n, 0.5)
 
+# this is a model for the fresnel factor which uses a uniform range of n values, from n - n_range / 2 to n + n_range / 2
+# the range is split into two parts, the part which does not totally internally reflect, and the part which does
+# the part that does totally internally reflect is simple to calculate perfectly
+# the part that does not is approximated by being represented by the center n value for the range
 
-def F(theta_i, n_0, n, polarization):
-    return polarization * F_p(theta_i, n_0, n) + (1 - polarization) * F_s(theta_i, n_0, n)
+n_range = 0.001
 
+# assumes unpolarized light
+# takes in a masked array only including where total internal reflection doesn't happen
+# uses algebra to avoid taking the sin and cosines of an arcsin
+def F_single(theta_i, n_0, n, polarization):
+    c = np.cos(theta_i)
+    s = np.sin(theta_i)
+    n_ratio = n_0 / n
+    s_reflection = np.power((n_0 * c - n * np.real(np.emath.sqrt(1 - n_ratio * n_ratio * s * s))) / 
+                               (n_0 * c + n * np.real(np.emath.sqrt(1 - n_ratio * n_ratio * s * s))), 2)
+    p_reflection = np.power((n_0 * np.real(np.emath.sqrt(1 - n_ratio * n_ratio * s * s)) - n * c) / 
+                               (n_0 * np.real(np.emath.sqrt(1 - n_ratio * n_ratio * s * s)) + n * c), 2)
+    
+    return (1-polarization) * s_reflection + polarization * p_reflection
 
+def F_single_no_internal(theta_i, n_0, n, polarization):
+    c = np.cos(theta_i)
+    s = np.sin(theta_i)
+    n_ratio = n_0 / n
+    s_reflection = np.power((n_0 * c - n * np.sqrt(1 - n_ratio * n_ratio * s * s)) / 
+                               (n_0 * c + n * np.sqrt(1 - n_ratio * n_ratio * s * s)), 2)
+    p_reflection = np.power((n_0 * np.sqrt(1 - n_ratio * n_ratio * s * s) - n * c) / 
+                               (n_0 * np.sqrt(1 - n_ratio * n_ratio * s * s) + n * c), 2)
+    
+    return (1-polarization) * s_reflection + polarization * p_reflection
+
+# takes in an array of theta_i values
+def F(theta_i, n_0, n, polarization=0.5):
+    n_crit = n_0 * np.sin(theta_i)
+    # if n is less than n_crit, then there is TIR
+
+    n_min_tir = n - n_range / 2.
+    n_max_non_tir = n + n_range / 2.
+
+    n_boundary_tir = np.maximum(n_min_tir, np.minimum(n_crit, n_max_non_tir)) # ideally n_crit, but forced to be bounded by the n range
+    n_center_no_tir = (n_max_non_tir + n_boundary_tir) / 2.
+    all_tir = n_center_no_tir < n_crit # array of booleans; true if full range has TIR
+    n_center_no_tir = n_center_no_tir*np.logical_not(all_tir)+n_0*all_tir # replaces n_center w/ n_0 if all_tir is true
+    
+    tir_frac = (n_boundary_tir - n_min_tir) / n_range # gives fraction of n values which cause TIR
+
+    non_tir_frac = 1. - tir_frac
+    non_tir_array = F_single_no_internal(theta_i, n_0, n_center_no_tir, polarization)* non_tir_frac # multiplies fresnel factor by fraction of n values represented by n_center
+    return np.add(tir_frac, non_tir_array)
+
+    
 # heaviside step function
 def H(x):
     return 0.5 * (np.sign(x) + 1)
@@ -222,19 +219,19 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
     # Cook-Torrance distribution, p. 87
     # def P(alpha_):
         # return np.exp(-np.tan(alpha_)**2/gamma**2) / (np.pi * gamma**2 * np.cos(alpha_)**4)
-		
+        
     # New empirical distribution, based off of Lorentzian distribution in tan(alpha)
-	# Factor in front ensures normalization; calculated numerically, as integral doesn't have a closed form
-	# Normalization is correct to w/in 1% for gamma_prime from 0.05-0.3, 4% for gamma_prime from 0.03-0.05
+    # Factor in front ensures normalization; calculated numerically, as integral doesn't have a closed form
+    # Normalization is correct to w/in 1% for gamma_prime from 0.05-0.3, 4% for gamma_prime from 0.03-0.05
     # def P(alpha_):
         # gamma_prime = gamma/2 # scale so that this gamma is similar to gamma in CT and TR distributions
         # return (1.3981*gamma_prime+0.13) / (np.pi*gamma_prime**2*(1+(np.tan(alpha_)/gamma_prime)**2))
-			
+            
     # Bivariate-Cauchy distribution, from Claudio; distribution is normalized
     def P(alpha_):
         gamma_prime = gamma*0.74 # scale so that this gamma is similar to gamma in CT and TR distributions
         return gamma_prime*(gamma_prime+1)/(2*np.pi*np.cos(alpha_)**3*(gamma_prime**2+np.tan(alpha_)**2)**(3/2))
-			
+            
     # Check probably unnecessary; if cos errors pop up, will have to fix to work for arrays 
     # if theta_i == theta_r:
         # alpha_specular = 0
@@ -245,24 +242,24 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
 
     P_ = P(alpha_specular)
 
+    # print("theta_i_mean: {0:g}, theta_r_mean: {1:g}".format(np.mean(theta_i)*180/np.pi,np.mean(theta_r)*180/np.pi))
     t1=time.time()
-    #print("theta_prime, alpha_specular, P calculation time: {0}".format(t1-t0))
-	
+    
     # Wolff correction factor, p. 114 of thesis; uses global angles
-	# Breaking up into two parts: incident Fresnel factor (always scalar since theta_i is) and outgoing (can be an array)
-	# First deal w/ incident angle part of W: W=0 if theta_i > theta_crit = arcsin(n/n0) and n0>n; fraction making through should be integral of P*G*W
-	# but N is already integral of P*G; fraction of angles below theta_crit is integral of P(alpha)*sin(alpha)*cos(alpha)*dalpha*dphi_alpha
-	# 1-F(theta_i) is very close to 1 below theta_crit, so can just use integral above (skip G)
-	# Difficulty is in 2D integral: bounds of integration of microfacet angles (alpha, phi_alpha) are where theta_prime < theta_crit;
-	# theta_prime = arccos(cos(theta_i)*cos(alpha)+sin(theta_i)*sin(alpha)*cos(phi_alpha)) 
-	# Algorithm:
-	# Calculate phi_alpha_max using eqn below (above some inclination, no alpha achieves required condition)		
-	# Then break up [-phi_alpha_max, phi_alpha_max] into N parts and for each discrete phi_alpha:
-	#		calculate alpha_crit (where theta_prime = theta_crit)
-	#		sum up P(alpha)*sin(alpha)*cos(alpha)*dalpha*dphi_alpha for alpha in range [alpha_crit, pi/2]
-	# Add up all sums
+    # Breaking up into two parts: incident Fresnel factor (always scalar since theta_i is) and outgoing (can be an array)
+    # First deal w/ incident angle part of W: W=0 if theta_i > theta_crit = arcsin(n/n0) and n0>n; fraction making through should be integral of P*G*W
+    # but N is already integral of P*G; fraction of angles below theta_crit is integral of P(alpha)*sin(alpha)*cos(alpha)*dalpha*dphi_alpha
+    # 1-F(theta_i) is very close to 1 below theta_crit, so can just use integral above (skip G)
+    # Difficulty is in 2D integral: bounds of integration of microfacet angles (alpha, phi_alpha) are where theta_prime < theta_crit;
+    # theta_prime = arccos(cos(theta_i)*cos(alpha)+sin(theta_i)*sin(alpha)*cos(phi_alpha)) 
+    # Algorithm:
+    # Calculate phi_alpha_max using eqn below (above some inclination, no alpha achieves required condition)        
+    # Then break up [-phi_alpha_max, phi_alpha_max] into N parts and for each discrete phi_alpha:
+    #       calculate alpha_crit (where theta_prime = theta_crit)
+    #       sum up P(alpha)*sin(alpha)*cos(alpha)*dalpha*dphi_alpha for alpha in range [alpha_crit, pi/2]
+    # Add up all sums
     def W_crit(theta, theta_c, polarization=0.5, n_phi_alpha=25, n_alpha=100): 
-		# Assumes theta is a scalar
+        # Assumes theta is a scalar
         phi_alpha_m = phi_alpha_max(theta, theta_c) # Max phi_alpha where there is an angle alpha that can give theta_prime<theta_crit
         dphi_alpha = np.pi/n_phi_alpha
         d_alpha = np.pi/2/n_alpha
@@ -283,8 +280,8 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
             #W_list = 1 - F(th_p, n_0, n, polarization) # Can calculate Fresnel factor, multiply in sum, but slows down immensely, doesn't change value much
             W_sum += np.sum(P(alpha_range)*np.sin(alpha_range)*np.cos(alpha_range)*d_alpha*dphi_alpha)
         return W_sum
-	
-	# Incident part of W, W_i
+    
+    # Incident part of W, W_i
     if np.size(theta_i) > 1:
         # W_i = 1 - F(theta_i, n_0, n, polarization) # Use this if skipping W_crit calculation 
         theta_i_mean = np.mean(theta_i)
@@ -300,22 +297,24 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
             #W_i = 1 - F(theta_i, n_0, n, polarization)
         else:
            W_i = 1 - F(theta_i, n_0, n, polarization) 
-	
+    tw1=time.time()
     # Operating on masked arrays is slow; only use them if needed (inputs are arrays)
     if np.size(theta_r) > 1: # Have to use masks
         theta_r_mean = np.mean(theta_r)
         if n_0 > n and np.abs(n_0 / n * np.sin(theta_r_mean)) >= 1: # Above critical angle, just calculate W_crit for average angle
             theta_crit = np.arcsin(n/n_0)
             W_o = W_crit(theta_r_mean, theta_crit, polarization=0.5)
-        else:
-            mask = np.abs(n_0 / n * np.sin(theta_r)) >= 1
+        elif np.any(np.abs(n_0 / n * np.sin(theta_r)) >= 1): # use masks, some theta_r are above critical angle
+            mask = np.abs(n_0 / n * np.sin(theta_r)) >= 1 
             theta_r_mask = np.ma.masked_array(theta_r, mask)
             W_o = (1 - F_unpolarized(np.ma.arcsin(n_0 / n * np.sin(theta_r_mask)), n, n_0))
             W_o = np.ma.filled(W_o, fill_value=0)
+        else:
+            W_o = (1 - F_unpolarized(np.arcsin(n_0 / n * np.sin(theta_r)), n, n_0))
     else:
-		# theta_r is a single value
+        # theta_r is a single value
         if n_0 > n and np.abs(n_0 / n * np.sin(theta_r)) >= 1:
-			# the W expression would have an arcsin error
+            # the W expression would have an arcsin error
             theta_crit = np.arcsin(n/n_0)
             W_o = W_crit(theta_r, theta_crit, polarization=0.5) 
             #print("W_o critical calculation")
@@ -323,27 +322,27 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
         else:
             # There was a typo here (?), I changed by moving parentheses and taking a reciprocal
             W_o = (1 - F_unpolarized(np.arcsin(n_0 / n * np.sin(theta_r)), n, n_0))
+    tw2=time.time()
     W = W_i*W_o 
 
     # def omega(n,n_p,th): # Solid angle factor from beams expanding due to Snell's law
-        # return np.cos(th)/np.sqrt(1-(n_p/n)**2*np.sin(th)**2)	
+        # return np.cos(th)/np.sqrt(1-(n_p/n)**2*np.sin(th)**2) 
     # W=W*omega(n,n_0,theta_r)
-	
+    
     # theta_r_list = np.linspace(0.,np.pi/2,102)
     # #W_list = [(1 - F(theta_i, n_0, n, polarization)) * (1 - F_unpolarized(np.arcsin(n_0 / n * np.sin(t_r)), n, n_0)) for t_r in theta_r_list]
     # W_list = [(1 - F_unpolarized(np.arcsin(n_0 / n * np.sin(t_r)), n, n_0)) for t_r in theta_r_list]
     # plt.plot(theta_r_list*180./np.pi,W_list )
     # plt.show()
-			
+            
     t2=time.time()
-    #print("W calculation time: {0}".format(t2-t1))
-			
-	# Shadowing and masking, for Trowbridge-Reitz distribution; p. 108 of thesis
+            
+    # Shadowing and masking, for Trowbridge-Reitz distribution; p. 108 of thesis
     def G_prime(theta):
         return 2 / (1 + np.sqrt(1 + np.power(gamma * np.tan(theta), 2)))
-			
+            
     # Shadowing and masking, for Cook-Torrance (also called Beckman?) distribution
-	# From eq. 4.80, p. 108 of thesis, itself taken from https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.pdf
+    # From eq. 4.80, p. 108 of thesis, itself taken from https://www.cs.cornell.edu/~srm/publications/EGSR07-btdf.pdf
     # def G_prime(theta):
         # th = np.abs(theta) # Should be symmetric (definition of theta assumes positive)
         # # if theta=0, tan(theta)=0 and m_t -> inf, gauss_m=>0, erf(m_t)->1, G->1; if theta=pi/2, tan(theta)=>inf, m_t=>0, erf(m_t)=>0,gauss_m=>inf, G->0
@@ -352,7 +351,7 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
             # theta_mask = np.ma.masked_array(th, mask0)
             # m_t = 1/(gamma*np.ma.tan(theta_mask)) # m_t, if finite
             # m_t = np.ma.filled(m_t, fill_value=np.inf) 
-            # gauss_m = gamma*np.ma.tan(theta_mask)*np.exp(-m_t**2)/np.sqrt(np.pi)# mask if m_t = 0			
+            # gauss_m = gamma*np.ma.tan(theta_mask)*np.exp(-m_t**2)/np.sqrt(np.pi)# mask if m_t = 0         
             # gauss_m = np.ma.filled(gauss_m, fill_value=0)
             # return 2/(1 + scipy.special.erf(m_t) + gauss_m)
         # elif th==0: return 1 # Special cases that give infinities
@@ -361,21 +360,20 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
             # m_t = 1/(gamma*np.tan(th))
             # gauss_m = np.exp(-m_t**2)/(m_t*np.sqrt(np.pi))
             # return 2/(1 + scipy.special.erf(m_t) + gauss_m)
-			
+            
     # this has negative of the inside of the H functions from the paper, I think it was a typo
     G = H(np.pi / 2 - theta_i_prime) * H(np.pi / 2 - theta_r_prime) * \
         G_prime(theta_i) * G_prime(theta_r)
-			
+            
     t3=time.time()
-    #print("G calculation time: {0}".format(t3-t2))
-			
+            
     # Oren-Nayar correction factor(s) (1-A+B)*cos(theta_i);
     # From p. 8 of arXiv:0910.1056v1 (Reflectance of PTFE for Xenon Scintillation Light), using Torrance-Sparrow (not Trowbridge-Reitz)
     # (For comparison, Claudio's thesis p. 117 has Oren-Nayar correction factor, N, for Trowbridge-Reitz)
     theta_m = np.minimum(theta_i, theta_r)
 
     theta_M = np.maximum(theta_i, theta_r)
-	
+    
     use_N_TR=True
     # Model from Claudio's thesis, p. 117; calculated using Trowbridge-Reitz distribution
     if use_N_TR:
@@ -391,11 +389,11 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
         N = G_prime(theta_i) * G_prime(theta_r) * \
             (script_n_0 - np.tan(theta_i) * np.tan(theta_r) * np.cos(phi_r) * script_n)
     # Model from p. 8 of arXiv:0910.1056v1 (Reflectance of PTFE for Xenon Scintillation Light)
-	# Actually uses Torrance-Sparrow distribution!
+    # Actually uses Torrance-Sparrow distribution!
     # Note that this is the same as eq. 4.98 from Claudio's thesis, but with C=0 and gamma proportional to sigma_alpha
     # also Claudio's thesis has some typos, e.g. sign of B and inside H is wrong
-	# Can compare to Oren-Nayar paper (DOI 10.1145/192161.192213), eq. 27 or 30; here we choose coordinates so phi_i=0
-	# The simplified version used in the paper is eq. 30 
+    # Can compare to Oren-Nayar paper (DOI 10.1145/192161.192213), eq. 27 or 30; here we choose coordinates so phi_i=0
+    # The simplified version used in the paper is eq. 30 
     else:
         A = 0.5 * np.power(gamma, 2) / (np.power(gamma, 2) + 0.92)
 
@@ -406,18 +404,16 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
         use_second_order = False # allows reflected light a second reflection; has very little effect on shape
         if use_second_order:
             C = 0.17 * np.power(gamma, 2) / (np.power(gamma, 2) + 0.36) * \
-				(1-(2*theta_m/np.pi)**2*np.cos(phi_r))
+                (1-(2*theta_m/np.pi)**2*np.cos(phi_r))
             N = N + rho_L*C
 
     t4=time.time()
-    #print("N calculation time: {0}".format(t4-t3))
-			
+            
     # Use Fresnel factor relative to local angle theta_i_prime
     F_ = F(theta_i_prime, n_0, n, polarization)
 
     t5=time.time()
-    #print("F calculation time: {0}".format(t5-t4))
-	
+    
     # add specular spike, if parameters length >3
     specular_delta=0
     if len(parameters)>3:    
@@ -440,9 +436,26 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
     # erf_factor = 0.5*(1+scipy.special.erf((theta_r-theta_cutoff)/beta))
     #print("W: {0}, N: {1}".format(W,(1-A+B)))
     
+    
+    # print("theta_prime, alpha_specular, P calculation time: {0}".format(t1-t0))
+    # print("W_i calculation time: {0}".format(tw1-t1))
+    # print("W_o calculation time: {0}".format(tw2-tw1))
+    # print("Total W calculation time: {0}".format(t2-t1))
+    # print("G calculation time: {0}".format(t3-t2))
+    # print("N calculation time: {0}".format(t4-t3))
+    # print("F calculation time: {0}".format(t5-t4))
+    global time_w1,time_w2,time_wtot,time_G,time_N,time_F
+    time_w1+=tw1-t1
+    time_w2+=tw2-tw1
+    time_wtot+=t2-t1
+    time_G+=t3-t2
+    time_N+=t4-t3
+    time_F+=t5-t4
+    # print("W_i time: {0}, W_o time: {1}, W tot time: {2}, G time: {3}, N time: {4}, F time: {5}".format(time_w1, time_w2, time_wtot, time_G, time_N, time_F))
+    
     # Semi-empirical formula from p. 121
     # specular component is split into specular lobe w/ normalization=1-C and specular spike w/ normalization=C
-	# P, G, and (1-A+B) or N depend on microfacet distribution
+    # P, G, and (1-A+B) or N depend on microfacet distribution
     return [ (1-C) * F_ * G * P_ / (4 * np.cos(theta_i)) + C * F_ * G * specular_delta,
         rho_L / np.pi * W * N * np.cos(theta_r)]
 
@@ -460,32 +473,32 @@ def BRIDF(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision=-1):
     return pair[0] + pair[1]
 
 def theta_prime_calc(th_i, al, phi_al):
-	# Local angle for microfacet at angle al, inclination phi_al, with global incident angle th_i
-	# Note that because of the definition of arccos, this is always > 0, so should only be used when expected to be positive
-	# Works for array inputs
-	return np.arccos(np.cos(th_i)*np.cos(al)+np.sin(th_i)*np.sin(al)*np.cos(phi_al))
+    # Local angle for microfacet at angle al, inclination phi_al, with global incident angle th_i
+    # Note that because of the definition of arccos, this is always > 0, so should only be used when expected to be positive
+    # Works for array inputs
+    return np.arccos(np.cos(th_i)*np.cos(al)+np.sin(th_i)*np.sin(al)*np.cos(phi_al))
 
 def alpha_calc(th_i, th_p, phi_al):
-	# Microfacet angle alpha needed so that local angle is th_p, for global incident angle th_i and microfacet inclination phi_al
-	# By the angle definitions, alpha_tmp has the range [-pi, +pi]
-	# But the plane is unchanged by rotations by pi, so shift makes the range [-pi/2, +pi/2]
-	# Works for array inputs
+    # Microfacet angle alpha needed so that local angle is th_p, for global incident angle th_i and microfacet inclination phi_al
+    # By the angle definitions, alpha_tmp has the range [-pi, +pi]
+    # But the plane is unchanged by rotations by pi, so shift makes the range [-pi/2, +pi/2]
+    # Works for array inputs
     alpha_tmp = np.pi/2-np.arccos(np.cos(th_p)/np.sqrt(np.cos(th_i)**2+np.sin(th_i)**2*np.cos(phi_al)**2))\
             -np.arctan2(np.cos(th_i),np.sin(th_i)*np.cos(phi_al))
     shift = (alpha_tmp < -np.pi/2)*np.pi-(alpha_tmp > np.pi/2)*np.pi
     return alpha_tmp + shift
 
 def phi_alpha_max(th_i, th_p):
-	# Max microfacet inclination phi_alpha such that local angle th_p can be achieved for some microfacet angle alpha, 
-	# given incident angle th_i
-	# Works for array inputs
-	return np.arccos(np.sqrt(np.cos(th_p)**2-np.cos(th_i)**2)/np.sin(th_i)**2)
-	
+    # Max microfacet inclination phi_alpha such that local angle th_p can be achieved for some microfacet angle alpha, 
+    # given incident angle th_i
+    # Works for array inputs
+    return np.arccos(np.sqrt(np.cos(th_p)**2-np.cos(th_i)**2)/np.sin(th_i)**2)
+    
 def specular_spike_norm(theta_r, theta_i, K):
     return np.exp(-K / 2 * (np.cos(theta_i) + np.cos(theta_r))) # Version from Coimbra paper
     # return np.exp(-K *np.cos(theta_i)) # Version from Claudio's thesis
-	# Choice of version doesn't affect specular spike bc of delta function, but does affect specular lobe
-	# Version w/ theta_r effectively enhances specular lobe at viewing angles above specular, reduces below
+    # Choice of version doesn't affect specular spike bc of delta function, but does affect specular lobe
+    # Version w/ theta_r effectively enhances specular lobe at viewing angles above specular, reduces below
     
 # Calculates BRIDF as a function of parameters; inputs are in degrees, converted to radians; can be arrays
 # independent variables has the form [theta_r_in_degrees, phi_r_in_degrees, theta_i_in_degrees, n_0, polarization]
@@ -535,7 +548,7 @@ def average_BRIDF(independent_variables, log_rho_L, log_n_minus_one, log_gamma, 
     # only a slight speed up for 0.5 vs 0.25, so a precision of 0.5 or 0.25 seems reasonable
     # If sigma_theta_i>0, also add smearing in theta_i with width sigma_theta_i, to simulate the finite width of the incoming light
     # 0.14" collimator ID, 7" length -> arcsin(0.14/7) ~= 1.1 deg full opening angle for cone (if all light starts at a point before collimator)
-	# Or 1.1 deg half opening angle if light comes from full range of angles at the entrance
+    # Or 1.1 deg half opening angle if light comes from full range of angles at the entrance
     theta_r0 = independent_variables[0]
     phi_r0 = independent_variables[1]
     theta_i = independent_variables[2]
@@ -633,7 +646,7 @@ def fit_parameters(independent_variables_array_intensity_array, p0=[0.5, 1.5, 0.
         if len(p0)>3: p0_log.append(np.log(p0[3]))
         else: p0_log.append(np.log(2.0)) # default K value
     # initial parameters are the ones found in the paper
-	# Set parameter bounds, transformed to log space; if lower or upper bounds are length <3, use default unbounded in that direction
+    # Set parameter bounds, transformed to log space; if lower or upper bounds are length <3, use default unbounded in that direction
     bounds_min=bounds[0]
     bounds_max=bounds[1]
     if len(bounds_min)>2:
@@ -754,7 +767,7 @@ def reflectance(theta_i_in_degrees, n_0, polarization, parameters):
         # precision=-1 ensures that specular spike isn't included, though it may modify specular lobe normalization if parameters include K
         # will add specular spike by hand, since integration won't have a fixed grid, so ensuring a real delta function is difficult
         # sin(theta_r) is from solid angle, G is to correct for the fact that shadowed/masked light ends up reflected, see eq. 16 of Silva 2009 Xe scintillation
-		# Ideally, P is normalized with G in the integral, but none of the models we use do this 
+        # Ideally, P is normalized with G in the integral, but none of the models we use do this 
         return BRIDF(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision=-1) * np.sin(theta_r) / G 
 
     spec_spike = 0
@@ -781,7 +794,7 @@ def reflectance_diffuse(theta_i_in_degrees, n_0, polarization, parameters):
         # solid angle not used here
         G = G_calc(theta_r, phi_r, theta_i, n_0, polarization, parameters)
         # sin(theta_r) is from solid angle, G is to correct for the fact that shadowed/masked light ends up reflected, see eq. 16 of Silva 2009 Xe scintillation
-		# Ideally, P is normalized with G in the integral, but none of the models we use do this 
+        # Ideally, P is normalized with G in the integral, but none of the models we use do this 
         return BRIDF_diffuse(theta_r, phi_r, theta_i, n_0, polarization, parameters) * np.sin(theta_r) / G
 
     #theta_r_list = np.linspace(0.,np.pi/2,100)
@@ -827,7 +840,7 @@ def reflectance_specular(theta_i_in_degrees, n_0, polarization, parameters):
         # precision=-1 ensures that specular spike isn't included, though it may modify specular lobe normalization if parameters include K
         # will add specular spike by hand, since integration won't have a fixed grid, so ensuring a real delta function is difficult
         # sin(theta_r) is from solid angle, G is to correct for the fact that shadowed/masked light ends up reflected, see eq. 16 of Silva 2009 Xe scintillation
-		# Ideally, P is normalized with G in the integral, but none of the models we use do this 
+        # Ideally, P is normalized with G in the integral, but none of the models we use do this 
         return BRIDF_specular(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision=-1) * np.sin(theta_r) / G 
 
     spec_spike = 0
@@ -866,7 +879,8 @@ def reflectance_specular(theta_i_in_degrees, n_0, polarization, parameters):
 # independent variables array has as elements lists of independent variables for each point
 # at each point, it has the form [theta_r_in_degrees, phi_r_in_degrees, theta_i_in_degrees, n_0, polarization]
 # also included in first argument are the intensity values and their errors
-def fit_parameters_grid(independent_variables_array_intensity_array, rho_start, rho_end, rho_num, n_start, n_end, n_num, gamma_start, gamma_end, gamma_num, average_angle=0, precision=-1, sigma_theta_i=-1, plot=True, show=True):
+def fit_parameters_grid(independent_variables_array_intensity_array, rho_start, rho_end, rho_num, n_start, n_end, n_num, gamma_start, gamma_end, gamma_num, average_angle=0, precision=-1, sigma_theta_i=-1, plot=True, show=True, do_profiles=[False, True, False]):
+    tg0=time.time()
     independent_variables_array = independent_variables_array_intensity_array[0]
     #print(independent_variables_array)
     intensity_array = independent_variables_array_intensity_array[1]
@@ -883,17 +897,37 @@ def fit_parameters_grid(independent_variables_array_intensity_array, rho_start, 
                 grid_points.append([rho, n, gamma])
 
     length = len(grid_points)
-
-    chi2 = []
+    tg1=time.time()
+    chi2_red = []
     for i in range(len(grid_points)):
         grid_point = grid_points[i]
-        chi2.append(chi_squared(independent_variables_array, intensity_array, std_array, grid_point, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i))
+        chi2_red.append(chi_squared(independent_variables_array, intensity_array, std_array, grid_point, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i))
         if i%10 == 0:
-            print(str(i) + "/" + str(length))
-
-    min_index = np.argmin(chi2)
+            print("Grid point "+ str(i) + "/" + str(length))
+    tg2=time.time()
+    chi2_red=np.array(chi2_red)
+    min_index = np.argmin(chi2_red)
+    min_chi2 = chi2_red[min_index]
     min_params = grid_points[min_index]
-
+    
+    n_dof=len(intensity_array)-len(grid_points[0])
+    # print("n_dof: ", n_dof)
+    
+    # Profile method; similar results to marginalization
+    #get_profile(grid_points, chi2_red*n_dof, rho_num, n_num, gamma_num, do_profiles=[False, True, True])
+    
+    delta_chi2_red=chi2_red-min_chi2 # Use delta chi^2, to avoid numerical errors; just scales prob, doesn't change stats
+    prob=np.exp(-delta_chi2_red*n_dof/2.) # Want chi^2, not reduced; could scale so best fit gives chi^2/n=1...
+    prob=prob/np.sum(prob)
+    prob=np.reshape(prob,(rho_num,n_num,gamma_num))
+    param_arrays=[rho_array, n_array, gamma_array]
+    var_names=[r"$\rho_L$","n",r"$\gamma$"]
+    var_ranges=[[],[],[]]
+    for ii in range(len(do_profiles)):
+        if do_profiles[ii]:
+            var_ranges[ii]=marginalize(prob, ii, param_arrays[ii], x_name=var_names[ii], plot=plot)
+    
+    tg3=time.time()
     if plot:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
@@ -905,23 +939,190 @@ def fit_parameters_grid(independent_variables_array_intensity_array, rho_start, 
             p0.append(grid_points[i][0])
             p1.append(grid_points[i][1])
             p2.append(grid_points[i][2])
-            color.append(chi2[i])
+            color.append(chi2_red[i])
 
         a = ax.scatter(p0, p1, p2, c=color, norm=matplotlib.colors.LogNorm(), s=15)
 
         fig.colorbar(a)
 
-        ax.text2D(0., 0.95, "optimal parameters: rho_L = " + str(round(min_params[0], 5)) + ", n = " + str(round(min_params[1], 5)) + ", gamma = " + str(round(min_params[2], 5)), transform=ax.transAxes)
+        ax.text2D(0., 0.98, "optimal params: rho_L = " + str(round(min_params[0], 5)) + ", n = " + str(round(min_params[1], 5)) + ", gamma = " + str(round(min_params[2], 5)), transform=ax.transAxes)
 
         ax.set_xlabel('rho_L')
         ax.set_ylabel('n')
         ax.set_zlabel('gamma')
 
+        # Can draw contours in 2D if desired
+        #plt.figure()
+        #plt.contour(n_array,gamma_array,np.reshape(chi2_red,(n_num,gamma_num)))
+        
         if show:
             plt.show()
-
+    # print(tg1-tg0,tg2-tg1,tg3-tg2)
     return grid_points[min_index]
 
+def marginalize(prob, x_index, x_array, x_name="n", plot=False):
+    # takes as input an array of normalized probabilities for each grid point and gets the marginalized
+    # probability profile in a single dimension corresponding to x_index
+    marg_var_ind = list(range(3))
+    marg_var_ind.remove(x_index)
+    marg_var_ind = tuple(marg_var_ind)
+    prob_x=np.sum(prob,marg_var_ind) # marginalize over variables that are not the profile variable
+    cum_prob_x=np.cumsum(prob_x)
+    
+    dx=x_array[1]-x_array[0]
+    min_ind=np.argmax(prob_x)
+    max_p=prob_x[min_ind]
+    cum_sum=max_p
+    conf_lv=0.68
+    if cum_sum>conf_lv:
+        print("Warning: marginal profile has >{0:.0f}% in a single bin; use finer binning".format(conf_lv*100))
+        frac_int_cl=conf_lv/cum_sum
+        x_low=x_array[min_ind]-frac_int_cl*dx/2
+        x_hi=x_array[min_ind]+frac_int_cl*dx/2
+    else:
+        i_low=min_ind-1
+        i_hi=min_ind+1
+		# Moving outward from max probability bin, add adjacent bin of higher probability
+		# until sum probability exceeds confidence interval; then take edges of bins as confidence interval
+        while cum_sum < conf_lv:
+            if i_low>=0: p_low = prob_x[i_low]
+            else: p_low = -1
+            if i_hi<len(prob_x): p_hi = prob_x[i_hi]
+            else: p_hi = -1
+            if p_hi >= p_low:
+                cum_sum += p_hi
+                x_hi=x_array[i_hi]
+                i_hi += 1
+            else:
+                cum_sum += p_low
+                x_low=x_array[i_low]
+                i_low -= 1
+        x_low=x_array[i_low+1]-dx/2
+        x_hi=x_array[i_hi-1]+dx/2
+    print("{0:.0f}% CL range of ".format(conf_lv*100)+x_name+": {0:.5f} - {1:.5f}".format(x_low,x_hi))
+    
+    if plot:
+        plt.figure()
+        plt.plot(x_array,prob_x)
+        plt.plot(x_array,cum_prob_x)
+        # plt.gca().axhline(y=0.16,color='r')
+        # plt.gca().axhline(y=0.84,color='r')
+        plt.xlabel(x_name+r"$_{prof}$")
+        plt.ylabel("Probability")                
+        plt.gca().axvline(x=x_low,color="r", linestyle="--")
+        plt.gca().axvline(x=x_hi,color="r", linestyle="--")
+		
+    return [x_low, x_hi]
+    
+def get_profile(grid_points, chi2, rho_num, n_num, gamma_num, plot=True, show=True, do_profiles=[False, True, True]):
+    min_index = np.argmin(chi2)
+    min_chi2 = chi2[min_index]
+    min_params = grid_points[min_index]
+    
+    i_r_list=np.arange(rho_num)
+    i_n_list=np.arange(n_num)
+    i_g_list=np.arange(gamma_num)
+    index_list=[i_r_list, i_n_list, i_g_list]
+    
+    var_num=[rho_num, n_num, gamma_num]
+    var_names=[r"$\rho_L$","n",r"$\gamma$"]
+    
+    def i_glob_x(i_u, i_v, i_x, var_ind):
+        if var_ind==0: return i_glob(i_x, i_u, i_v)
+        if var_ind==1: return i_glob(i_u, i_x, i_v)
+        if var_ind==2: return i_glob(i_u, i_v, i_x)
+    
+    def i_glob(i_r,i_n,i_g):
+        return i_g + gamma_num*i_n + gamma_num*n_num*i_r
+
+    def index_gamma(i_glob):
+        return i_glob%gamma_num
+        
+    def index_n(i_glob):
+        return np.floor_divide(i_glob%(gamma_num*n_num),gamma_num)
+        
+    def index_rho(i_glob):
+        return np.floor_divide(i_glob,gamma_num*n_num)
+        
+    def index_var(i_glob, var_ind):
+        if var_ind==0: return index_rho(i_glob)
+        if var_ind==1: return index_n(i_glob)
+        if var_ind==2: return index_gamma(i_glob)
+    
+    for ii in range(len(do_profiles)):
+        if do_profiles[ii]:
+            i_uv=[0,1,2]
+            i_uv.remove(ii)
+            u_var_ind, v_var_ind=i_uv # variables not profiled over are u, v; keep track of their mapping onto rho, n, gamma
+            # get list of other two var indices to search over for each profile value
+            v_grid, u_grid=np.meshgrid(index_list[v_var_ind],index_list[u_var_ind])
+            u_grid=u_grid.flatten()
+            v_grid=v_grid.flatten()
+            # initialize list of profile values and chi^2 values
+            chi2_prof=[]#[min_chi2]
+            u_prof=[]#[min_params[u_var_ind]]
+            v_prof=[]#[min_params[v_var_ind]]
+            x_prof=[]#[min_params[ii]] # profile variable is called x from hereon
+            # get x index of global minimum
+            i_x_min = index_var(min_index, ii)
+            # go through list of x values to profile over
+            for i_x_prof in np.arange(var_num[ii]):
+                #if i_x_prof == i_x_min: continue # already checked global minimum
+                # get list of global indices to try
+                i_glob_test = i_glob_x(u_grid, v_grid, i_x_prof, ii)
+                # find where minimum of chi2 occurs for this fixed value of x
+                chi2_test = chi2[i_glob_test]
+                i_min_test = np.argmin(chi2_test)
+                chi2_min = chi2_test[i_min_test]
+                i_glob_min = i_glob_test[i_min_test]
+                # store chi2, u, and v for the best fit at this profile value
+                chi2_prof.append(chi2_min-min_chi2) # subtract out global minimum
+                u_prof.append(grid_points[i_glob_min][u_var_ind])
+                v_prof.append(grid_points[i_glob_min][v_var_ind])
+                x_prof.append(grid_points[i_glob_min][ii])
+            
+            chi2_prof=np.array(chi2_prof)
+            
+            # fit profile to a quadratic
+            def quad_fitter(x,a,b,c):
+                #return a*(x-n_array[i_x_min])**2+min_chi2 # use this form to force minimum position to match the best fit pt
+                return a*x**2+b*x+c
+                
+            prof_fit = scipy.optimize.curve_fit(quad_fitter, x_prof, chi2_prof)[0]
+            
+            chi2_tgt=0.5 # delta chi2 from minimum
+            # Get x values where profile curve intersects chi2_tgt (e.g. +/- 1 sigma range)
+            chi2_above_low=np.where(np.logical_and(chi2_prof>chi2_tgt,x_prof<min_params[ii]))
+            low_ind=chi2_above_low[0][-1]
+            slope_low=(chi2_prof[low_ind]-chi2_prof[low_ind+1])/(x_prof[low_ind]-x_prof[low_ind+1])
+            x_low = x_prof[low_ind]+(chi2_tgt-chi2_prof[low_ind])/slope_low
+            
+            chi2_above_hi=np.where(np.logical_and(chi2_prof>chi2_tgt,x_prof>min_params[ii]))
+            hi_ind=chi2_above_hi[0][0]
+            slope_hi=(chi2_prof[hi_ind-1]-chi2_prof[hi_ind])/(x_prof[hi_ind-1]-x_prof[hi_ind])
+            x_hi = x_prof[hi_ind]+(chi2_tgt-chi2_prof[hi_ind])/slope_hi
+            print("+/- 1 sigma range of "+var_names[ii]+": {0:.5f} - {1:.5f}".format(x_low,x_hi))
+            
+                
+            # Plot the profile fit
+            if plot:
+                fig=plt.figure()
+                plt.plot(x_prof,chi2_prof,linestyle="",marker=".")
+                for jj in range(len(x_prof)):
+                    plt.text(x_prof[jj],chi2_prof[jj],var_names[u_var_ind]+"={0:.5f}, \n".format(u_prof[jj])+var_names[v_var_ind]+"={0:.5f}".format(v_prof[jj]))
+                plt.xlabel(var_names[ii]+r"$_{prof}$")
+                plt.ylabel(r"$\Delta\chi^2$")
+            
+                x_fit=np.linspace(min(x_prof),max(x_prof),100)
+                chi2_fit=quad_fitter(x_fit,prof_fit[0],prof_fit[1],prof_fit[2])
+                plt.plot(x_fit,chi2_fit)
+                plt.gca().axhline(y=chi2_tgt,color="r")
+                plt.text(min(x_prof),chi2_tgt+0.05,r"+/- 1 $\sigma$" "\n" "range of "+var_names[ii]+": \n{0:.5f} - {1:.5f}".format(x_low,x_hi))
+                #plt.text(min(x_prof),chi2_tgt-0.1,"range of "+var_names[ii]+": {0:.3f} - {1:.3f}".format(x_low,x_hi))
+                plt.gca().axvline(x=x_low,color="r", linestyle="--")
+                plt.gca().axvline(x=x_hi,color="r", linestyle="--")
+    if plot and show: plt.show()
+        
 # Returns chi^2/degrees of freedom for the given data set and fit parameters
 def chi_squared(independent_variables_array, intensity_array, std_array, parameters, average_angle=0, precision=-1, sigma_theta_i=-1):
     params_log = [np.log(parameters[0]), np.log(parameters[1]-1), np.log(parameters[2])]

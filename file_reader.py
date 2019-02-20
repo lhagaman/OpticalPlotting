@@ -19,12 +19,18 @@ class Run:
 		file = open(path + filename)
 		lines = file.readlines()
 		data = np.loadtxt(path + filename, skiprows=12)
-		flat_bkg = 70#100 # constant background from e.g. dark rate; 500 for initial Spectralon 400 nm data, 100 for 500 nm data
+		flat_bkg = 140#100 # constant background from e.g. dark rate; 500 for initial Spectralon 400 nm data, 100 for 500 nm data
 		# chosen to be slightly less than lowest rate during background measurement in LXe
 		# Have been using 70 for 1st/2nd run LXe data at 178 nm, 150 for vacuum data at 178/175 nm
 		self.incidentpower = float(lines[8][16:-1])
 		if are_you_scott:
-			beam_bkg_filename = "3rd Xenon Run Measurements\\Power and background at 178 nm\\2018_12_21__12_51_57.txt" #background with beam on goes here 
+			beam_bkg_filename = "3rd Xenon Run Measurements\\Power and background at 178 nm\\2018_12_21__12_51_57.txt"
+			#"2nd Xenon Run Measurements\\165 nm measurements\\Power and background measurements\\2018_12_06__11_15_32.txt"
+			#"2nd Xenon Run Measurements\\220 nm measurements\\Power and background measurements\\2018_12_06__15_02_43.txt"
+			#"First Xe Run Measurements\\first measurements with no bubbles in cell 11-01-2\\Initial power and background at 178 nm\\2018_11_01__14_56_35.txt"
+			#"2nd Xenon Run Measurements\\300 nm measurements\\Power and background measurements\\2018_12_06__16_23_26.txt"
+			#"2nd Xenon Run Measurements\\400 nm measurements\\Power and background measurements\\2018_12_06__17_33_50.txt"
+			#"3rd Xenon Run Measurements\\Power and background at 178 nm\\2018_12_21__12_51_57.txt" #background with beam on goes here 
 			# "First Xe Run Measurements\\first measurements with no bubbles in cell 11-01-2\\Initial power and background at 178 nm\\2018_11_01__14_56_35.txt"
 		else:
 			beam_bkg_filename = "First Xe Run Measurements/first measurements with no bubbles in cell 11-01-2/Initial power and background at 178 nm/2018_11_01__14_56_35.txt" #background with beam on goes here 
@@ -40,12 +46,13 @@ class Run:
 		# dark_bkg_data = np.loadtxt(dark_bkg_filename,skiprows = 12)
 		# self.dark_bkg_intensities = np.array([datum[1] for datum in dark_bkg_data])
 		# self.dark_bkg_angles = np.array([datum[0] for datum in dark_bkg_data])
-		# self.dark_bkg_intensities=200
-		# bkg_scaling=1.0	
-		bkg = self.beam_bkg_intensities*(self.incidentpower/self.beam_bkg_incidentpower)
-		#self.dark_bkg_intensities #use this to subtract background with beam off
-		#(self.beam_bkg_intensities-self.dark_bkg_intensities)*(self.incidentpower/self.beam_bkg_incidentpower)*bkg_scaling +self.dark_bkg_intensities
+		self.dark_bkg_intensities=200
+		bkg_scaling=0.5
+		bkg = (self.beam_bkg_intensities-self.dark_bkg_intensities)*(self.incidentpower/self.beam_bkg_incidentpower)*bkg_scaling +self.dark_bkg_intensities
         #use above to subtract total background, with separate dark background and beam background scaled by bkg_scaling
+		#self.beam_bkg_intensities*(self.incidentpower/self.beam_bkg_incidentpower)		
+		#self.dark_bkg_intensities #use this to subtract background with beam off
+		
 		self.angles = [datum[0] for datum in data]
 		self.incidentangle = float(lines[7][16:-1])
 		self.bkg = []        
@@ -173,7 +180,9 @@ def intensity_factor(incidentpower):
 
 	# product of this and measured rate is (rate/str)/rate_i
 	# intensity_factor * rate = (rate / photodiode_solid_angle) / flux_i
-	intensity_factor = 1. / (photodiode_solid_angle * incidentpower)
+	intensity_correction = 1.0 # Corrects power measurement for light missing PMT; assumed to be the same for data and bkg measurements (i.e. does not affect scaling of bkg)
+	# In LXe: 178nm - 75.3%; 165nm - 64.2%; 220nm - 85.6%; 300nm - 90.1%; 400nm - 90.9%
+	intensity_factor = intensity_correction / (photodiode_solid_angle * incidentpower)
 	
 	return intensity_factor
 

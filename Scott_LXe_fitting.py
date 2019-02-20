@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from file_reader import Run, get_independent_variables_and_relative_intensities
 from plotting import plot_runs, plot_TSTR_fit
-from TSTR_fit_new import fit_parameters, fit_parameters_and_angle, fitter, BRIDF_plotter, reflectance_diffuse, reflectance_specular, BRIDF
+from TSTR_fit_new import fit_parameters, fit_parameters_and_angle, fit_parameters_grid, fitter, BRIDF_plotter, reflectance_diffuse, reflectance_specular, BRIDF, chi_squared
 import time
 
 path_run1 = "First Xe Run Measurements\\first measurements with no bubbles in cell 11-01-2\\"
@@ -128,6 +128,36 @@ s9_lowp_above_60 = Run(path + "Sample 9 1-8_ above center\\2018_12_07__11_22_25.
 s9_lowp_above_67 = Run(path + "Sample 9 1-8_ above center\\2018_12_07__11_17_42.txt")
 s9_lowp_above_75 = Run(path + "Sample 9 1-8_ above center\\2018_12_07__11_12_10.txt")
 
+
+# Second run, data at different wavelengths
+s9_400nm_30 = Run(path + "400 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__18_12_04.txt")
+s9_400nm_45 = Run(path + "400 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__18_06_45.txt")
+s9_400nm_52 = Run(path + "400 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__18_01_31.txt")
+s9_400nm_60 = Run(path + "400 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__17_55_29.txt") 
+s9_400nm_67 = Run(path + "400 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__17_50_00.txt")
+s9_400nm_75 = Run(path + "400 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__17_44_20.txt")
+
+s9_300nm_30 = Run(path + "300 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__17_13_09.txt")
+s9_300nm_45 = Run(path + "300 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__17_07_12.txt")
+s9_300nm_52 = Run(path + "300 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__17_01_52.txt")
+s9_300nm_60 = Run(path + "300 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__16_56_28.txt") 
+s9_300nm_67 = Run(path + "300 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__16_51_05.txt")
+s9_300nm_75 = Run(path + "300 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__16_45_01.txt")
+
+s9_220nm_30 = Run(path + "220 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__15_50_30.txt")
+s9_220nm_45 = Run(path + "220 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__15_43_49.txt")
+s9_220nm_52 = Run(path + "220 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__15_37_13.txt")
+s9_220nm_60 = Run(path + "220 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__15_30_34.txt") 
+s9_220nm_67 = Run(path + "220 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__15_22_53.txt")
+s9_220nm_75 = Run(path + "220 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__15_16_18.txt")
+
+s9_165nm_30 = Run(path + "165 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__14_26_35.txt")
+s9_165nm_45 = Run(path + "165 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__14_16_28.txt")
+s9_165nm_52 = Run(path + "165 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__14_10_06.txt")
+s9_165nm_60 = Run(path + "165 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__14_03_03.txt") 
+s9_165nm_67 = Run(path + "165 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__13_56_29.txt")
+s9_165nm_75 = Run(path + "165 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__13_49_07.txt")
+
 path_run3 = "3rd Xenon Run Measurements\\" # Any kind of correction for drifting power? Strongest in 3rd run
 s9_r3_lowp_30 = Run(path_run3 + "Sample 9, 0.2 barg\\2018_12_20__10_53_38.txt")
 s9_r3_lowp_45 = Run(path_run3 + "Sample 9, 0.2 barg\\2018_12_20__10_58_38.txt")
@@ -193,12 +223,12 @@ s2_r3_hip_67.change_theta_i(67)
 s2_r3_hip_75 = Run(path_run3 + "Sample 2, 1.4 barg\\2018_12_19__19_12_01.txt")
 s2_r3_hip_75.change_theta_i(75)
 
-runs =[s2_r3_lowp_above_30,s2_r3_lowp_above_45,s2_r3_lowp_above_52,s2_r3_lowp_above_60,s2_r3_lowp_above_67,s2_r3_lowp_above_75]#[s9_r3_lowp_30,s9_r3_lowp_45,s9_r3_lowp_52,s9_r3_lowp_60,s9_r3_lowp_67,s9_r3_lowp_75]#[s9_lowp_above_30,s9_lowp_above_45,s9_lowp_above_52,s9_lowp_above_60,s9_lowp_above_67,s9_lowp_above_75]#[s9_bubbles_30,s9_bubbles_45,s9_bubbles_52,s9_bubbles_60,s9_bubbles_67,s9_bubbles_75]#[s9_lowp_30,s9_lowp2_30,s9_medp_30,s9_medp2_30,s9_hip_30,s9_hip2_30]#[s9_medp2_30,s9_medp2_45,s9_medp2_52,s9_medp2_60,s9_medp2_67,s9_medp2_75,s9_hip2_30,s9_hip2_45,s9_hip2_52,s9_hip2_60,s9_hip2_67,s9_hip2_75]#[s9_lowp2_30,s9_lowp2_45,s9_lowp2_52,s9_lowp2_60,s9_lowp2_67,s9_lowp2_75,s9_medp2_30,s9_medp2_45,s9_medp2_52,s9_medp2_60,s9_medp2_67,s9_medp2_75,s9_hip2_30,s9_hip2_45,s9_hip2_52,s9_hip2_60,s9_hip2_67,s9_hip2_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75,s9_lowp_above_30,s9_lowp_above_45,s9_lowp_above_52,s9_lowp_above_60,s9_lowp_above_67,s9_lowp_above_75]#[s9_lowp_75,s9_medp_75,s9_hip_75]#[s9_medp_30,s9_medp_45,s9_medp_52,s9_medp_60,s9_medp_67,s9_medp_75,s9_hip_30,s9_hip_45,s9_hip_52,s9_hip_60,s9_hip_67,s9_hip_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75,s9_medp_30,s9_medp_45,s9_medp_52,s9_medp_60,s9_medp_67,s9_medp_75,s9_hip_30,s9_hip_45,s9_hip_52,s9_hip_60,s9_hip_67,s9_hip_75]#[s9_nobubbles_30,s9_nobubbles_45,s9_nobubbles_52,s9_nobubbles_60,s9_nobubbles_67,s9_nobubbles_75,s9_getter_30,s9_getter_45,s9_getter_52,s9_getter_60,s9_getter_67,s9_getter_75]#[s9_first_30,s9_first_45,s9_first_52,s9_first_60,s9_first_67,s9_first_75,s9_nobubbles_30,s9_nobubbles_45,s9_nobubbles_52,s9_nobubbles_60,s9_nobubbles_67,s9_nobubbles_75]#
+runs =[s2_r3_hip_30,s2_r3_hip_45,s2_r3_hip_52,s2_r3_hip_60,s2_r3_hip_67,s2_r3_hip_75]#[s9_165nm_30,s9_165nm_45,s9_165nm_52,s9_165nm_60,s9_165nm_67,s9_165nm_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75]#[s9_r3_lowp_30,s9_r3_lowp_45,s9_r3_lowp_52,s9_r3_lowp_60,s9_r3_lowp_67,s9_r3_lowp_75]#[s9_lowp_above_30,s9_lowp_above_45,s9_lowp_above_52,s9_lowp_above_60,s9_lowp_above_67,s9_lowp_above_75]#[s9_bubbles_30,s9_bubbles_45,s9_bubbles_52,s9_bubbles_60,s9_bubbles_67,s9_bubbles_75]#[s9_lowp_30,s9_lowp2_30,s9_medp_30,s9_medp2_30,s9_hip_30,s9_hip2_30]#[s9_medp2_30,s9_medp2_45,s9_medp2_52,s9_medp2_60,s9_medp2_67,s9_medp2_75,s9_hip2_30,s9_hip2_45,s9_hip2_52,s9_hip2_60,s9_hip2_67,s9_hip2_75]#[s9_lowp2_30,s9_lowp2_45,s9_lowp2_52,s9_lowp2_60,s9_lowp2_67,s9_lowp2_75,s9_medp2_30,s9_medp2_45,s9_medp2_52,s9_medp2_60,s9_medp2_67,s9_medp2_75,s9_hip2_30,s9_hip2_45,s9_hip2_52,s9_hip2_60,s9_hip2_67,s9_hip2_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75,s9_lowp_above_30,s9_lowp_above_45,s9_lowp_above_52,s9_lowp_above_60,s9_lowp_above_67,s9_lowp_above_75]#[s9_lowp_75,s9_medp_75,s9_hip_75]#[s9_medp_30,s9_medp_45,s9_medp_52,s9_medp_60,s9_medp_67,s9_medp_75,s9_hip_30,s9_hip_45,s9_hip_52,s9_hip_60,s9_hip_67,s9_hip_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75,s9_medp_30,s9_medp_45,s9_medp_52,s9_medp_60,s9_medp_67,s9_medp_75,s9_hip_30,s9_hip_45,s9_hip_52,s9_hip_60,s9_hip_67,s9_hip_75]#[s9_nobubbles_30,s9_nobubbles_45,s9_nobubbles_52,s9_nobubbles_60,s9_nobubbles_67,s9_nobubbles_75,s9_getter_30,s9_getter_45,s9_getter_52,s9_getter_60,s9_getter_67,s9_getter_75]#[s9_first_30,s9_first_45,s9_first_52,s9_first_60,s9_first_67,s9_first_75,s9_nobubbles_30,s9_nobubbles_45,s9_nobubbles_52,s9_nobubbles_60,s9_nobubbles_67,s9_nobubbles_75]#
 labels=["30 degrees","45 degrees","52 degrees","60 degrees", "67 degrees", "75 degrees"]#,"30 degrees","45 degrees","52 degrees","60 degrees", "67 degrees", "75 degrees"]#["0.2 barg","0.2 barg fixed","1.0 barg","1.0 barg fixed","1.5 barg","1.5 barg fixed"]#["1.0 barg, 30 deg","1.0 barg, 45 deg","1.0 barg, 52 deg","1.0 barg, 60 deg","1.0 barg, 67 deg","1.0 barg, 75 deg","1.5 barg, 30 deg","1.5 barg, 45 deg","1.5 barg, 52 deg","1.5 barg, 60 deg","1.5 barg, 67 deg","1.5 barg, 75 deg"]#["0.2 barg, 30 deg","0.2 barg, 45 deg","0.2 barg, 52 deg","0.2 barg, 60 deg","0.2 barg, 67 deg","0.2 barg, 75 deg","1.0 barg, 30 deg","1.0 barg, 45 deg","1.0 barg, 52 deg","1.0 barg, 60 deg","1.0 barg, 67 deg","1.0 barg, 75 deg","1.5 barg, 30 deg","1.5 barg, 45 deg","1.5 barg, 52 deg","1.5 barg, 60 deg","1.5 barg, 67 deg","1.5 barg, 75 deg"]#["center, 30 deg","center, 45 deg","center, 52 deg","center, 60 deg","center, 67 deg","center, 75 deg","1/8\" above, 30 deg","1/8\" above, 45 deg","1/8\" above, 52 deg","1/8\" above, 60 deg","1/8\" above, 67 deg","1/8\" above, 75 deg"]#["0.2 barg","1.0 barg","1.5 barg"]#["1.0 barg, 30 deg","1.0 barg, 45 deg","1.0 barg, 52 deg","1.0 barg, 60 deg","1.0 barg, 67 deg","1.0 barg, 75 deg","1.5 barg, 30 deg","1.5 barg, 45 deg","1.5 barg, 52 deg","1.5 barg, 60 deg","1.5 barg, 67 deg","1.5 barg, 75 deg"]#["0.2 barg, 30 deg","0.2 barg, 45 deg","0.2 barg, 52 deg","0.2 barg, 60 deg","0.2 barg, 67 deg","0.2 barg, 75 deg","1.0 barg, 30 deg","1.0 barg, 45 deg","1.0 barg, 52 deg","1.0 barg, 60 deg","1.0 barg, 67 deg","1.0 barg, 75 deg","1.5 barg, 30 deg","1.5 barg, 45 deg","1.5 barg, 52 deg","1.5 barg, 60 deg","1.5 barg, 67 deg","1.5 barg, 75 deg"]#["30 deg","45 deg","52 deg","60 deg","67 deg","75 deg"]#["before getter, 30 deg", "before getter, 45 deg", "before getter, 52 deg", "before getter, 60 deg", "before getter, 67 deg", "before getter, 75 deg", "after getter, 30 deg", "after getter, 45 deg", "after getter, 52 deg", "after getter, 60 deg", "after getter, 67 deg", "after getter, 75 deg"]#["75 degrees"]#["run 1, 30 deg", "run 1, 45 deg", "run 1, 52 deg", "run 1, 60 deg", "run 1, 67 deg", "run 1, 75 deg", "run 2, 30 deg", "run 2, 45 deg", "run 2, 52 deg", "run 2, 60 deg", "run 2, 67 deg", "run 2, 75 deg"]#
 
 # Plot BRIDF data
-sample_name="M17 turn"
-plot_runs(runs, title=sample_name+" in 0.2 barg LXe, 1/8\" above center, 178 nm", log=True, labels=labels, include_legend=True, errorbars=True, legend_loc=0)
+sample_name="LZ skived"
+plot_runs(runs, title=sample_name+" in 0.2 barg LXe, 165 nm", log=True, labels=labels, include_legend=True, errorbars=True, legend_loc=0)
 # plt.text(0.88,0.88,r"$75^{\circ}$",transform=plt.gca().transAxes,fontsize=13) # Positions for s9 low_p
 # plt.text(0.85,0.78,r"$67^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
 # plt.text(0.8,0.62,r"$60^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
@@ -226,7 +256,8 @@ t0=time.time()
 # tmp1=np.arange(10)
 # tmp2=np.arange(4,14)
 # print(tmp1,tmp2,np.linspace(tmp1,tmp2,1))
-fit_params = fit_parameters(get_independent_variables_and_relative_intensities(runs),p0=[1.1,1.55,.08,5.],average_angle=4, precision=.25, sigma_theta_i=2, use_errs=True,use_spike=False,bounds=([0.7,1.4,0.04,3.],[1.7,1.8,0.3,50.]))#[0.5,1.4,0.04,5.0],[1.2,1.8,0.3,50.]#[0.5,1.4,0.1],[1.0,1.8,0.3]#[0.01,1.01,0.05],[2.0,3.0,0.5]
+# fit_params = fit_parameters(get_independent_variables_and_relative_intensities(runs),p0=[0.2,1.8,.15,5.],average_angle=4, precision=.25, sigma_theta_i=-1, use_errs=True,use_spike=False,bounds=([0.1,1.4,0.03,3.],[1.4,2.6,0.6,50.]))
+# fit_params = fit_parameters(get_independent_variables_and_relative_intensities(runs),p0=[1.1,1.55,.2,5.],average_angle=4, precision=.25, sigma_theta_i=2, use_errs=True,use_spike=False,bounds=([0.7,1.4,0.04,3.],[1.7,1.8,0.3,50.]))#[0.5,1.4,0.04,5.0],[1.2,1.8,0.3,50.]#[0.5,1.4,0.1],[1.0,1.8,0.3]#[0.01,1.01,0.05],[2.0,3.0,0.5]
 #fit_params_ang = fit_parameters_and_angle(get_independent_variables_and_relative_intensities(runs),average_angle=4.)
 #fit_ang = fit_params_ang[0]
 #fit_params = fit_params_ang[1:]
@@ -238,12 +269,26 @@ fit_params_vacuum=[0.68114103391512837, 1.6259581862678401, 0.11282346636450034,
 # fit_params_hip=[0.9871481402574648, 1.5715034469520426, 0.09586940402324681]
 # Fitter parameters for s9 in LXe, 2.00 solid angle factor, BC model
 fit_params_lowp=[1.1077461844574992, 1.5547594445581758, 0.10054542669454647]
+fit_params_lowp_nrange_0_12=[1.1036187692365016, 1.5556531315657196, 0.10075277940099392]
 fit_params_hip2=[1.1999650882272368, 1.5436916548263535, 0.20783614159557665]
 fit_params_hip=[1.1525410041990918, 1.5691617861938227, 0.11806736015270886, 11.114872654849078]
 fit_params_s8=[1.30037846657779, 1.5481537596293447, 0.060365408007835346, 4.900748469692683]
+fit_params_s9_400nm=[0.6916903132118614, 1.7685668238585814, 0.052664172718245646]
+fit_params_s9_400nm_nrange_0_15=[0.6414663099143563, 2.0285416875437416, 0.2071409460435925]
+# fit_params=fit_params_lowp_nrange_0_12
 # Fitter parameters for s9 in LXe, 3rd run, 2.00 solid angle factor, BC model
 fit_params_r3_s9_lowp= [1.0216459850600514, 1.5467069707623793, 0.1101614104957136]
 # fit_params=fit_params_r3_s9_lowp
+# Fitter parameters for s2 in LXe, 3rd run, 2.00 solid angle factor, BC model
+fit_params_r3_s2_hip=[1.0720924015263558, 1.5425690292388028, 0.20472829546890117] # error on n from fit is 1.542-1.543; correlation is 2% w/ rho, -48% w/ gamma (gamma and rho are -0.8%, i.e. very uncorrelated); not much difference in profile for 20 pts in rho, gamma vs 10
+# Keeping rho fixed doesn't affect profile much; fixing gamma narrows it (but still chi^2/n only changes by ~.02 over nominal error range of +/- 0.001 or so; fit seems to think it's even more constrained than raw chi^2/n says) - this was w/o averaging
+# Profile is significantly narrower and minimum is deeper when doing full averaging - still estimate ~.02 change in chi^2 over nominal error range of +/- 0.001 (gamma, rho fixed); probably due to difficulty estimating such small changes
+# More points in n and gamma but fewer in rho gave slightly deeper minimum
+# For fixed gamma, rho, chi^2 changes by ~1 when index changes by ~0.014
+# For fixed rho, floating gamma, chi^2 changes by ~0.5 (+/- 1 sigma) when index changes by ~0.013
+# Fit w/ absolute_sigma=False gives about twice the error estimate on n, but still much too small
+fit_params=fit_params_r3_s2_hip
+
 # # Fitted parameters for s9 2.44 solid angle factor
 # fit_params_lowp=[0.784,1.568,0.144]
 # fit_params_lowp2=[0.892,1.563,0.176]
@@ -268,14 +313,28 @@ plot_TSTR_fit(30., n_LXe_178, fit_params, color="r", average_angle=average_angle
 plot_TSTR_fit(45., n_LXe_178, fit_params, color="g", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
 plot_TSTR_fit(52., n_LXe_178, fit_params, color="b", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
 plot_TSTR_fit(60., n_LXe_178, fit_params, color="m", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-plot_TSTR_fit(69, n_LXe_178, fit_params, color="c", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-plot_TSTR_fit(77, n_LXe_178, fit_params, color="y", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(67, n_LXe_178, fit_params, color="c", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(75, n_LXe_178, fit_params, color="y", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
 # plot_TSTR_fit(75., n_LXe_178, fit_params, color="y", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i,phi_r=5)
 # plot_TSTR_fit(75., n_LXe_178, fit_params, color="y", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i,phi_r=10)
 #plt.text(0.1,0.1,r"Fit: $\rho_L$={0:.3f}, n={1:.2f}, $\gamma$={2:.3f}".format(*fit_params),transform=plt.gca().transAxes,fontsize=13)
 #plt.text(0.1,0.2,r"Fit: $\rho_L$={0:.3f}, n={1:.2f}, $\gamma$={2:.3f}, K={3:.3f}".format(*fit_params),transform=plt.gca().transAxes,fontsize=13)
 t2=time.time()
 print("Plotting time: {0}".format(t2-t1))
+
+# Try averaging over multiple indices
+# plot_runs(runs, title=sample_name+" in 0.2 barg LXe, 165 nm", log=True, labels=labels, include_legend=True, errorbars=True, legend_loc=0, figure=True)
+
+
+# run_data=get_independent_variables_and_relative_intensities(runs)
+# chi_sq=chi_squared(run_data[0], run_data[1], run_data[2], fit_params, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+# print("Chi squared from fit: ",chi_sq)
+
+# Profiling in 3D is expensive, unnecessary when variables are weakly correlated
+# Separate out into blocks correlated by ~>10%; e.g. do combined 2D profile for n, gamma; then separate 1D profile for rho
+# To stay near minimum, set center of range to best fit, use an odd number of points
+# Start w/ a wide range in profile, few points, then adjust and refine
+grid_results = fit_parameters_grid(get_independent_variables_and_relative_intensities(runs),rho_start=1.072, rho_end=1.072, rho_num=1, n_start=1.542, n_end=1.5432, n_num=15, gamma_start=0.202, gamma_end=0.208, gamma_num=15, plot=True, show=True, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i, do_profiles=[False, True, True])
 
 # Now calculate hemispherical reflectance
 # plt.figure()
@@ -322,6 +381,8 @@ print("Plotting time: {0}".format(t2-t1))
 # # y_specular_LXe_lowp_215=[0.0017852149063135958, 0.001818308226244964, 0.0019795301316915003, 0.002543034835696333, 0.009548179713833347, 0.053554449148170015, 0.11833288201197621, 0.2823038620542749, 0.5406700804638772, 0.6790627367772443, 0.798665136503454, 1.0700312085436152]
 # y_diffuse_LXe_lowp=[0.9266064823674807, 0.9265704632837276, 0.9265018071134418, 0.9262701814312928, 0.9240684435664849, 0.9141206564704799, 0.8915297546482749, 0.761874690361145, 0.2629238588222386, 0.11379313619522459, 0.06190015347709465, 0.03963860351008269]
 # y_specular_LXe_lowp=[0.0017275000631306692, 0.0017476375724292414, 0.0018610656328319315, 0.0022948430948827032, 0.007651243849065006, 0.04394224210952713, 0.11074467133765065, 0.3068205025510641, 0.6153235998043434, 0.7629784298122186, 0.8530040361670844, 1.0528088681336794]
+# y_diffuse_LXe_lowp_nrange_0_12 = [0.9241829143644459, 0.9241468889960962, 0.9240787598471459, 0.9238504970970207, 0.9216890931525608, 0.9119557742592572, 0.8899549445268882, 0.5903236321522066, 0.26568393272061674, 0.11483593779759056, 0.06235568461855687, 0.03979878583818896]
+# y_specular_LXe_lowp_nrange_0_12 =  [0.0017036874347853338, 0.0017235345857333317, 0.0018352543890812374, 0.002261999394083116, 0.008492343244381738, 0.04342943475762406, 0.1124622878735221, 0.29591521525792086, 0.5473931732412308, 0.7276610603448042, 0.8337474320040098, 1.0344270398761855]
 # y_specular_LXe_lowp=[min(x[0],1-x[1]) for x in zip(y_specular_LXe_lowp,y_diffuse_LXe_lowp)]
 # y_total_LXe_lowp = [sum(x) for x in zip(y_specular_LXe_lowp,y_diffuse_LXe_lowp)]
 # y_total_LXe_lowp_full = y_total_LXe_lowp[:]
@@ -355,9 +416,9 @@ print("Plotting time: {0}".format(t2-t1))
 # # # y_specular_LXe_hip2=  [0.0016528720786998794, 0.0016884735251564945, 0.001857732976822431, 0.0024483848517261844, 0.009600045662265523, 0.06251613539473333, 0.13418304588129548, 0.25679333990263276, 0.4159533052261603, 0.5728408076108408, 0.7414240888009019, 1.0]#1.1194372218351034]
 # # # y_total_LXe_hip2 = [sum(x) for x in zip(y_specular_LXe_hip2,y_diffuse_LXe_hip2)]
 
-# # plt.plot(x, y_diffuse, label="diffuse")
-# # plt.plot(x, y_specular, label="specular")
-# # plt.plot(x, y_total, label="total")
+# plt.plot(x, y_diffuse, label="diffuse")
+# plt.plot(x, y_specular, label="specular")
+# plt.plot(x, y_total, label="total")
 # plt.plot(x, y_specular_vacuum_after, label="specular, vacuum",linestyle='-',color='y')
 # plt.plot(x, y_specular_LXe_lowp, label="specular, 0.2 barg LXe",linestyle='-.',color='y')
 # # #plt.plot(x, y_specular_LXe_lowp2, label="spec_lowp2")

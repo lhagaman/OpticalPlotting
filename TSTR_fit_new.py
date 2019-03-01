@@ -135,8 +135,12 @@ def BRIDF_plotter(theta_r_in_degrees_array, phi_r_in_degrees, theta_i_in_degrees
             if parameters[3]>0: log_K = np.log(parameters[3])
             else: log_K = None
         else: log_K = None
+        if len(parameters)>4:
+            if parameters[4]>0: log_nu = np.log(parameters[4])
+            else: log_nu = None
+        else: log_nu = None
         for theta_r_in_degrees in theta_r_in_degrees_array: # For each point, calculate the BRIDF along a grid nearby and average it
-            avgs.append(average_BRIDF([theta_r_in_degrees,phi_r_in_degrees,theta_i_in_degrees,n_0,polarization], log_rho_L, log_n_minus_one, log_gamma, log_K, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i))
+            avgs.append(average_BRIDF([theta_r_in_degrees,phi_r_in_degrees,theta_i_in_degrees,n_0,polarization], log_rho_L, log_n_minus_one, log_gamma, log_K, log_nu, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i))
         return avgs
 
 # Takes a set of viewing angles and intensities and returns the average, for each point, of adjacent points w/in +/- angle/2
@@ -412,9 +416,9 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
         N = 1 - A + B
         use_second_order = False # allows reflected light a second reflection; has very little effect on shape
         if use_second_order:
-            C = 0.17 * np.power(gamma, 2) / (np.power(gamma, 2) + 0.36) * \
+            CC = 0.17 * np.power(gamma, 2) / (np.power(gamma, 2) + 0.36) * \
                 (1-(2*theta_m/np.pi)**2*np.cos(phi_r))
-            N = N + rho_L*C
+            N = N + rho_L*CC
 
     t4=time.time()
             
@@ -427,15 +431,17 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
     specular_delta=0
     if len(parameters)>3:    
         K = parameters[3]
-        # this is where it differs from semi-empirical fit, Lambda was slightly different 
-        # see Silva Oct. 2009 "A model of the reflection distribution in the vacuum ultra violet region"
-        C = specular_spike_norm(theta_r, theta_i, K)
-        # integrated over the photodiode solid angle, the delta functions go away; make sure spike isn't double counted
-        is_theta_spec = np.logical_or(np.abs(theta_r - theta_i) < precision/2., theta_r==theta_i+precision/2.) 
-        is_phi_spec = np.logical_or(np.abs(phi_r) < precision/2.,phi_r==precision/2.) 
-        is_specular = np.logical_and(is_theta_spec, is_phi_spec)
-        #print(is_specular)
-        specular_delta = is_specular/precision**2 # only one point in grid is non-zero; magnitude scales w/ grid size to preserve average
+        if K > 0:
+            # this is where it differs from semi-empirical fit, Lambda was slightly different 
+            # see Silva Oct. 2009 "A model of the reflection distribution in the vacuum ultra violet region"
+            C = specular_spike_norm(theta_r, theta_i, K)
+            # integrated over the photodiode solid angle, the delta functions go away; make sure spike isn't double counted
+            is_theta_spec = np.logical_or(np.abs(theta_r - theta_i) < precision/2., theta_r==theta_i+precision/2.) 
+            is_phi_spec = np.logical_or(np.abs(phi_r) < precision/2.,phi_r==precision/2.) 
+            is_specular = np.logical_and(is_theta_spec, is_phi_spec)
+            #print(is_specular)
+            specular_delta = is_specular/precision**2 # only one point in grid is non-zero; magnitude scales w/ grid size to preserve average
+        else: C = 0
     else:
         C = 0
     
@@ -461,12 +467,18 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
     time_N+=t4-t3
     time_F+=t5-t4
     # print("W_i time: {0}, W_o time: {1}, W tot time: {2}, G time: {3}, N time: {4}, F time: {5}".format(time_w1, time_w2, time_wtot, time_G, time_N, time_F))
+	
+    if len(parameters)>4:
+        if parameters[4] > 0: nu = parameters[4]
+        else: nu = 1.0
+    else:
+        nu = 1.0
     
     # Semi-empirical formula from p. 121
     # specular component is split into specular lobe w/ normalization=1-C and specular spike w/ normalization=C
     # P, G, and (1-A+B) or N depend on microfacet distribution
-    return [ (1-C) * F_ * G * P_ / (4 * np.cos(theta_i)) + C * F_ * G * specular_delta,
-        rho_L / np.pi * W * N * np.cos(theta_r)]
+    return [ nu * (1-C) * F_ * G * P_ / (4 * np.cos(theta_i)) + nu * C * F_ * G * specular_delta,
+        nu * rho_L / np.pi * W * N * np.cos(theta_r)]
 
 
 def BRIDF_specular(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision=-1):
@@ -511,7 +523,7 @@ def specular_spike_norm(theta_r, theta_i, K):
     
 # Calculates BRIDF as a function of parameters; inputs are in degrees, converted to radians; can be arrays
 # independent variables has the form [theta_r_in_degrees, phi_r_in_degrees, theta_i_in_degrees, n_0, polarization]
-def unvectorized_fitter(independent_variables, log_rho_L, log_n_minus_one, log_gamma, log_K=None, precision=-1):
+def unvectorized_fitter(independent_variables, log_rho_L, log_n_minus_one, log_gamma, log_K=None, log_nu=None, precision=-1):
     theta_r = independent_variables[0] * np.pi / 180
     phi_r = independent_variables[1] * np.pi / 180
     theta_i = independent_variables[2] * np.pi / 180
@@ -524,11 +536,17 @@ def unvectorized_fitter(independent_variables, log_rho_L, log_n_minus_one, log_g
     parameters = [rho_L, n, gamma]
     if log_K is not None:
         parameters.append(np.exp(log_K))
+    else: 
+        parameters.append(-1)
+    if log_nu is not None:
+        parameters.append(np.exp(log_nu))
+    else: 
+        parameters.append(-1)
     return BRIDF(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision=precision)
 
 
 # independent variables without angle has the form [theta_r_in_degrees, phi_r_in_degrees, n_0, polarization]
-def unvectorized_fitter_with_angle(independent_variables_without_angle, theta_i, log_rho_L, log_n_minus_one, log_gamma, log_K=None, precision=-1):
+def unvectorized_fitter_with_angle(independent_variables_without_angle, theta_i, log_rho_L, log_n_minus_one, log_gamma, log_K=None, log_nu=None, precision=-1):
     theta_r = independent_variables_without_angle[0] * np.pi / 180
     phi_r = independent_variables_without_angle[1] * np.pi / 180
     n_0 = independent_variables_without_angle[2]
@@ -540,6 +558,12 @@ def unvectorized_fitter_with_angle(independent_variables_without_angle, theta_i,
     parameters = [rho_L, n, gamma]
     if log_K is not None:
         parameters.append(np.exp(log_K))
+    else: 
+        parameters.append(-1)
+    if log_nu is not None:
+        parameters.append(np.exp(log_nu))
+    else: 
+        parameters.append(-1)
     return BRIDF(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision=precision)
 
 
@@ -550,7 +574,7 @@ def get_relative_gaussian_weights(x, mu, sigma):
     return [np.exp(-(x_ - mu) * (x_ - mu) / (2 * sigma * sigma)) for x_ in x]
 
 
-def average_BRIDF(independent_variables, log_rho_L, log_n_minus_one, log_gamma, log_K, average_angle, precision=0.25, sigma_theta_i=2.0):
+def average_BRIDF(independent_variables, log_rho_L, log_n_minus_one, log_gamma, log_K, log_nu, average_angle, precision=0.25, sigma_theta_i=2.0):
     # For a single point, calculate BRIDF values on a grid within a circle of diameter average_angle from center
     # and average them all; grid spacing is given by precision; all angles in degrees
     # Timing tests suggest that there's almost no speed up between a precision of 0.5 and 1 (for average_angle=4), and
@@ -598,20 +622,27 @@ def average_BRIDF(independent_variables, log_rho_L, log_n_minus_one, log_gamma, 
     else:
         weights = [1.0]*len(tt)
     #print(tt[:25],pp[:25])
-    return np.sum(weights * unvectorized_fitter([tt,pp,theta_i]+list(independent_variables[3:]),log_rho_L, log_n_minus_one, log_gamma, log_K, precision=precision)) / np.sum(weights)
+    return np.sum(weights * unvectorized_fitter([tt,pp,theta_i]+list(independent_variables[3:]),log_rho_L, log_n_minus_one, log_gamma, log_K, log_nu, precision=precision)) / np.sum(weights)
 
     
 # takes arrays of independent variable lists; last two independent variables are precision and average_angle (assumed to be the same for all points)
-def fitter(independent_variables_array, log_rho_L, log_n_minus_one, log_gamma, log_K=None):
+def fitter(independent_variables_array, log_rho_L, log_n_minus_one, log_gamma, log_K=None, log_nu=None):
+
     average_angle = independent_variables_array[0][-1]
     precision = independent_variables_array[0][-2]
     sigma_theta_i = independent_variables_array[0][-3]
-    # Could be fitting many runs, w/ different params like incident angle or medium index
-
+    use_nu = independent_variables_array[0][-4]
+    use_spike = independent_variables_array[0][-5]
+	# dirty hack so it is possible to fit nu but skip specular spike; 
+	# in this case, fifth argument from curve_fit is actually log_nu (but called log_K in fitter definition)
+    if use_nu and not use_spike: 
+        log_nu = log_K
+        log_K = None
+	# Could be fitting many runs, w/ different params like incident angle or medium index
     if precision <= 0: 
         arr = []
         for independent_variables in independent_variables_array:
-            arr.append(unvectorized_fitter(independent_variables, log_rho_L, log_n_minus_one, log_gamma, log_K, precision=precision))
+            arr.append(unvectorized_fitter(independent_variables, log_rho_L, log_n_minus_one, log_gamma, log_K, log_nu, precision=precision))
         if average_angle > 0: # Just average adjacent points in plane
             theta_r_in_degrees_array = [ind_vars[0] for ind_vars in independent_variables_array]
             # need to have theta_r in degrees! ind. vars is a list, each entry of which contains a list including theta_r (first)
@@ -624,7 +655,7 @@ def fitter(independent_variables_array, log_rho_L, log_n_minus_one, log_gamma, l
         # t2=time.time()
         avgs = []
         for independent_variables in independent_variables_array: # For each point, calculate the BRIDF along a grid nearby and average it
-            avgs.append(average_BRIDF(independent_variables, log_rho_L, log_n_minus_one, log_gamma, log_K, average_angle, precision=precision, sigma_theta_i=sigma_theta_i))
+            avgs.append(average_BRIDF(independent_variables, log_rho_L, log_n_minus_one, log_gamma, log_K, log_nu, average_angle, precision=precision, sigma_theta_i=sigma_theta_i))
         # t3=time.time()
         # print("Average BRIDF time: {0}".format(t3-t2))
         return avgs
@@ -643,17 +674,23 @@ def fitter_with_angle(independent_variables_without_angle_array, theta_i, log_rh
 # if sigma_theta_i is positive and doing a 2D average in theta_r, phi_r, sets Gaussian sigma for smearing in incident angle
 # use_errs sets whether to use the run's relative_std values to weight the fitting by or to use uniform errors
 # use_spike sets whether to include the specular spike in the BRIDF model
-def fit_parameters(independent_variables_array_intensity_array, p0=[0.5, 1.5, 0.05], average_angle=0, precision=-1, sigma_theta_i=-1, use_errs=True, use_spike=False, bounds=([-np.inf],[np.inf])):
+def fit_parameters(independent_variables_array_intensity_array, p0=[0.5, 1.5, 0.05], average_angle=0, precision=-1, sigma_theta_i=-1, use_errs=True, use_spike=False, use_nu=False, bounds=([-np.inf],[np.inf])):
     independent_variables_array = independent_variables_array_intensity_array[0]
-    independent_variables_array = [list+[sigma_theta_i,precision,average_angle] for list in independent_variables_array]
+    independent_variables_array = [list+[use_spike,use_nu,sigma_theta_i,precision,average_angle] for list in independent_variables_array]
     #print(independent_variables_array)
     intensity_array = independent_variables_array_intensity_array[1]
     if use_errs: std_array = independent_variables_array_intensity_array[2]
     else: std_array = None
     p0_log = [np.log(p0[0]), np.log(p0[1]-1), np.log(p0[2])]
+    free_params = 3
     if use_spike:
+        free_params += 1
         if len(p0)>3: p0_log.append(np.log(p0[3]))
         else: p0_log.append(np.log(2.0)) # default K value
+    if use_nu:
+        free_params += 1
+        if len(p0)>4: p0_log.append(np.log(p0[4]))
+        else: p0_log.append(np.log(1.0)) # default nu value
     # initial parameters are the ones found in the paper
     # Set parameter bounds, transformed to log space; if lower or upper bounds are length <3, use default unbounded in that direction
     bounds_min=bounds[0]
@@ -661,18 +698,20 @@ def fit_parameters(independent_variables_array_intensity_array, p0=[0.5, 1.5, 0.
     if len(bounds_min)>2:
         bounds_min_log=[np.log(bounds_min[0]), np.log(bounds_min[1]-1), np.log(bounds_min[2])]
         if len(bounds_min)>3 and use_spike: bounds_min_log.append(np.log(bounds_min[3]))
+        if len(bounds_min)>4 and use_nu: bounds_min_log.append(np.log(bounds_min[4]))
     else:
         bounds_min_log=-np.inf
     if len(bounds_max)>2:
         bounds_max_log=[np.log(bounds_max[0]), np.log(bounds_max[1]-1), np.log(bounds_max[2])]
         if len(bounds_max)>3 and use_spike: bounds_max_log.append(np.log(bounds_max[3]))
+        if len(bounds_max)>4 and use_nu: bounds_max_log.append(np.log(bounds_max[4]))
     else:
         bounds_max_log=np.inf
     bounds_log=(bounds_min_log, bounds_max_log)
     # fitter_p0 = fitter(independent_variables_array, p0_log[0], p0_log[1], p0_log[2])
     # res_fit_p0 = np.sum((np.array(intensity_array) - np.array(fitter_p0))**2)
     fit_results = scipy.optimize.curve_fit(fitter, np.array(independent_variables_array), np.array(intensity_array),
-                                          p0=p0_log, sigma=std_array, absolute_sigma=True, bounds=bounds_log, ftol=1e-7, xtol=1e-7)
+                                          p0=p0_log, sigma=std_array, absolute_sigma=True, bounds=bounds_log, ftol=1e-7, xtol=1e-7, verbose=0)
     fit_params_log = fit_results[0]
     cov_matrix = fit_results[1]
     #print("Covariance matrix (log): \n", cov_matrix)
@@ -685,7 +724,7 @@ def fit_parameters(independent_variables_array_intensity_array, p0=[0.5, 1.5, 0.
     
     fitter_popt = fitter(independent_variables_array, *fit_params_log)
     if std_array is not None:
-        chi2_fit_popt = np.sum(((np.array(intensity_array) - np.array(fitter_popt))/std_array)**2)/(len(intensity_array)-len(fit_params_log))
+        chi2_fit_popt = np.sum(((np.array(intensity_array) - np.array(fitter_popt))/std_array)**2)/(len(intensity_array)-free_params)
         print("Fit reduced chi^2: ",chi2_fit_popt)
     # tmp = (np.array(intensity_array) - np.array(fitter_popt))/std_array
     # top_diffs = np.argpartition(tmp**2,-10)[-10:]
@@ -700,10 +739,13 @@ def fit_parameters(independent_variables_array_intensity_array, p0=[0.5, 1.5, 0.
     max_gamma = np.exp(fit_params_log[2]+errs[2])
     param_ranges = [[min_rho,max_rho],[min_n,max_n],[min_gamma,max_gamma]]
     if len(fit_params_log)>3: param_ranges.append([np.exp(fit_params_log[3]-errs[3]),np.exp(fit_params_log[3]+errs[3])])
+    if len(fit_params_log)>4: param_ranges.append([np.exp(fit_params_log[4]-errs[4]),np.exp(fit_params_log[4]+errs[4])])
     print("Min and max values: \n",param_ranges)
     
     params = [np.exp(fit_params_log[0]), np.exp(fit_params_log)[1] + 1, np.exp(fit_params_log[2])]
+    if use_nu and not use_spike: params.append(-1) # hack so that returned parameters are in the right order
     if len(fit_params_log)>3: params.append(np.exp(fit_params_log[3]))
+    if len(fit_params_log)>4: params.append(np.exp(fit_params_log[4]))
     return params
 
 
@@ -785,7 +827,9 @@ def reflectance(theta_i_in_degrees, n_0, polarization, parameters):
         K=parameters[3]
         C = specular_spike_norm(theta_i, theta_i, K)
         F_ = F(theta_i, n_0, n, polarization)
-        spec_spike = C * F_
+        if len(parameters)>4: nu=parameters[4]
+        else: nu=1.0
+        spec_spike = C * F_ * nu
         
     return scipy.integrate.dblquad(BRIDF_int, -np.pi, np.pi, a, b)[0] + spec_spike
 
@@ -857,8 +901,10 @@ def reflectance_specular(theta_i_in_degrees, n_0, polarization, parameters):
         n=parameters[1]
         K=parameters[3]
         C = specular_spike_norm(theta_i, theta_i, K)
-        F_ = F(theta_i, n_0, n, polarization)
-        spec_spike = C * F_
+        F_ = F(theta_i, n_0, n, polarization)        
+        if len(parameters)>4: nu=parameters[4]
+        else: nu=1.0
+        spec_spike = C * F_ * nu
 
     if n_0>parameters[1]: # If medium index is higher than sample, use 1D integrals instead
         phi_r_list = np.linspace(-np.pi,np.pi,500)
@@ -1135,13 +1181,26 @@ def get_profile(grid_points, chi2, rho_num, n_num, gamma_num, plot=True, show=Tr
 # Returns chi^2/degrees of freedom for the given data set and fit parameters
 def chi_squared(independent_variables_array, intensity_array, std_array, parameters, average_angle=0, precision=-1, sigma_theta_i=-1):
     params_log = [np.log(parameters[0]), np.log(parameters[1]-1), np.log(parameters[2])]
+    n_free_params = 3
+    use_spike=False
+    use_nu=False
     if len(parameters)>3: 
-        if parameters[3]>0: params_log.append(np.log(parameters[3]))
+        use_spike=True
+        if parameters[3]>0: 
+            params_log.append(np.log(parameters[3]))
+            n_free_params += 1
+        else: params_log.append(None)
+    if len(parameters)>4: 
+        use_nu=True
+        if parameters[4]>0: 
+            params_log.append(np.log(parameters[4]))
+            n_free_params += 1
+        else: params_log.append(None)
     
-    independent_variables_array = [list+[sigma_theta_i,precision,average_angle] for list in independent_variables_array]
+    independent_variables_array = [list+[use_spike,use_nu,sigma_theta_i,precision,average_angle] for list in independent_variables_array]
     
-    fitter_popt = fitter(independent_variables_array, *params_log)
-    chi2 = np.sum(((np.array(intensity_array) - np.array(fitter_popt))/std_array)**2)/(len(intensity_array)-len(params_log))
+    fitter_popt = fitter(independent_variables_array, *params_log)# 
+    chi2 = np.sum(((np.array(intensity_array) - np.array(fitter_popt))/std_array)**2)/(len(intensity_array)-n_free_params)
     #print("Fit reduced chi^2: ",chi2_fit_popt)
 
     return chi2

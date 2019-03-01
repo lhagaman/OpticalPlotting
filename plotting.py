@@ -122,10 +122,14 @@ def plot_TSTR_fit(theta_i, n, fit_params, label="", color="", average_angle=0, p
 	else:
 		plt.plot(x, BRIDF_plotter(x, phi_r, theta_i, n, 0.5, fit_params, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i), color=color)
 	if include_fit_text:
-		if len(fit_params) == 3:
-			plt.text(0.05,0.05 + fit_text_offset, fit_text + r"$\rho_L$={0:.4f}, n={1:.4f}, $\gamma$={2:.4f}".format(*fit_params),transform=plt.gca().transAxes,fontsize=13)
-		else:
-			plt.text(0.05,0.05 + fit_text_offset, fit_text + r"$\rho_L$={0:.4f}, n={1:.4f}, $\gamma$={2:.4f}, K={3:.4f}".format(*fit_params),transform=plt.gca().transAxes,fontsize=13)
+		fit_text += r"$\rho_L$={0:.4f}, n={1:.4f}, $\gamma$={2:.4f}".format(fit_params[0],fit_params[1],fit_params[2])
+		if len(fit_params) == 4:
+			if fit_params[3] > 0:
+				fit_text += ", K={0:.2f}".format(fit_params[3])
+		if len(fit_params) == 5:
+			if fit_params[4] > 0:
+				fit_text += r", $\nu$={0:.3f}".format(fit_params[4])
+		plt.text(0.05,0.05 + fit_text_offset, fit_text,transform=plt.gca().transAxes,fontsize=13)
 	plt.legend()
 
 """fit_params=["rho_L_1","n_1","gamma_1","K_1",

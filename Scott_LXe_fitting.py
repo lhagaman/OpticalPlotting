@@ -40,8 +40,11 @@ s5_30 = Run(path + "Sample 5 with bubbles\\2018_11_30__14_24_00.txt")
 s5_45 = Run(path + "Sample 5 with bubbles\\2018_11_30__14_29_18.txt")
 s5_52 = Run(path + "Sample 5 with bubbles\\2018_11_30__14_38_44.txt") # Two files exist for 52 deg; first probably got redone bc the angle range was too small
 s5_60 = Run(path + "Sample 5 with bubbles\\2018_11_30__14_43_44.txt") 
+s5_60.change_theta_i(59)
 s5_67 = Run(path + "Sample 5 with bubbles\\2018_11_30__14_48_38.txt")
+s5_67.change_theta_i(67)
 s5_75 = Run(path + "Sample 5 with bubbles\\2018_11_30__14_54_19.txt")
+s5_75.change_theta_i(74)
 s8_30 = Run(path + "Sample 8 no bubbles\\2018_12_03__14_52_24.txt")
 s8_45 = Run(path + "Sample 8 no bubbles\\2018_12_03__14_46_48.txt")
 s8_52 = Run(path + "Sample 8 no bubbles\\2018_12_03__14_42_00.txt")
@@ -49,7 +52,7 @@ s8_60 = Run(path + "Sample 8 no bubbles\\2018_12_03__14_57_12.txt")
 s8_67 = Run(path + "Sample 8 no bubbles\\2018_12_03__15_01_51.txt")
 s8_67.change_theta_i(66.5)
 s8_75 = Run(path + "Sample 8 no bubbles\\2018_12_03__15_06_25.txt") 
-s8_75.change_theta_i(75)
+s8_75.change_theta_i(74.5)
 # s9_first_30 = Run(path_run1 + "Sample 9\\2018_11_02__20_38_01.txt")
 # s9_first_45 = Run(path_run1 + "Sample 9\\2018_11_02__20_32_34.txt")
 # s9_first_52 = Run(path_run1 + "Sample 9\\2018_11_02__20_27_27.txt")
@@ -75,21 +78,29 @@ s9_getter_60 = Run(path + "Sample 9 no bubbles\\After getter\\2018_12_03__10_58_
 s9_getter_67 = Run(path + "Sample 9 no bubbles\\After getter\\2018_12_03__10_53_50.txt")
 s9_getter_75 = Run(path + "Sample 9 no bubbles\\After getter\\2018_12_03__10_48_50.txt") 
 s9_lowp_30 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_52_04.txt")
-s9_lowp_30.change_theta_i(30)
+s9_lowp_30.change_theta_i(29)
 s9_lowp_45 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_47_09.txt")
+s9_lowp_45.change_theta_i(47)
 s9_lowp_52 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_42_21.txt")
-s9_lowp_52.change_theta_i(52)
+s9_lowp_52.change_theta_i(53)
 s9_lowp_60 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_37_31.txt")
-s9_lowp_60.change_theta_i(60) 
+s9_lowp_60.change_theta_i(59) 
 s9_lowp_67 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_32_47.txt")
 s9_lowp_67.change_theta_i(67)
 s9_lowp_75 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_27_55.txt")
+s9_lowp_75.change_theta_i(75)
 s9_lowp2_30 = Run(path + "Sample 9 lower pressure 2\\2018_12_07__13_28_41.txt")
+s9_lowp2_30.change_theta_i(29)
 s9_lowp2_45 = Run(path + "Sample 9 lower pressure 2\\2018_12_07__13_23_51.txt")
+s9_lowp2_45.change_theta_i(47)
 s9_lowp2_52 = Run(path + "Sample 9 lower pressure 2\\2018_12_07__13_18_50.txt")
+s9_lowp2_52.change_theta_i(52)
 s9_lowp2_60 = Run(path + "Sample 9 lower pressure 2\\2018_12_07__13_14_04.txt") 
+s9_lowp2_60.change_theta_i(59)
 s9_lowp2_67 = Run(path + "Sample 9 lower pressure 2\\2018_12_07__13_09_15.txt")
+s9_lowp2_67.change_theta_i(66)
 s9_lowp2_75 = Run(path + "Sample 9 lower pressure 2\\2018_12_07__13_04_19.txt")
+s9_lowp2_75.change_theta_i(74)
 s9_medp_30 = Run(path + "Sample 9 medium pressure\\2018_12_05__15_56_28.txt")
 s9_medp_45 = Run(path + "Sample 9 medium pressure\\2018_12_05__15_51_07.txt")
 s9_medp_52 = Run(path + "Sample 9 medium pressure\\2018_12_05__15_44_43.txt")
@@ -133,7 +144,7 @@ s9_lowp_above_75 = Run(path + "Sample 9 1-8_ above center\\2018_12_07__11_12_10.
 s9_400nm_30 = Run(path + "400 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__18_12_04.txt")
 s9_400nm_30.change_theta_i(28)
 s9_400nm_45 = Run(path + "400 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__18_06_45.txt")
-s9_400nm_45.change_theta_i(43)
+s9_400nm_45.change_theta_i(45)
 s9_400nm_52 = Run(path + "400 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__18_01_31.txt")
 s9_400nm_52.change_theta_i(50)
 s9_400nm_60 = Run(path + "400 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__17_55_29.txt") 
@@ -144,25 +155,43 @@ s9_400nm_75 = Run(path + "400 nm measurements\\Power and sample 9 reflectivity m
 s9_400nm_75.change_theta_i(73)
 
 s9_300nm_30 = Run(path + "300 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__17_13_09.txt")
+s9_300nm_30.change_theta_i(30)
 s9_300nm_45 = Run(path + "300 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__17_07_12.txt")
+s9_300nm_45.change_theta_i(45) 
 s9_300nm_52 = Run(path + "300 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__17_01_52.txt")
-s9_300nm_60 = Run(path + "300 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__16_56_28.txt") 
+s9_300nm_52.change_theta_i(52) 
+s9_300nm_60 = Run(path + "300 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__16_56_28.txt")
+s9_300nm_60.change_theta_i(60) 
 s9_300nm_67 = Run(path + "300 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__16_51_05.txt")
+s9_300nm_67.change_theta_i(65)
 s9_300nm_75 = Run(path + "300 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__16_45_01.txt")
+s9_300nm_75.change_theta_i(76.001)
 
 s9_220nm_30 = Run(path + "220 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__15_50_30.txt")
+s9_220nm_30.change_theta_i(30)
 s9_220nm_45 = Run(path + "220 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__15_43_49.txt")
+s9_220nm_45.change_theta_i(45)
 s9_220nm_52 = Run(path + "220 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__15_37_13.txt")
+s9_220nm_52.change_theta_i(52)
 s9_220nm_60 = Run(path + "220 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__15_30_34.txt") 
+s9_220nm_60.change_theta_i(60)
 s9_220nm_67 = Run(path + "220 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__15_22_53.txt")
+s9_220nm_67.change_theta_i(65)
 s9_220nm_75 = Run(path + "220 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__15_16_18.txt")
+s9_220nm_75.change_theta_i(74)
 
 s9_165nm_30 = Run(path + "165 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__14_26_35.txt")
+s9_165nm_30.change_theta_i(28)
 s9_165nm_45 = Run(path + "165 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__14_16_28.txt")
+s9_165nm_45.change_theta_i(44)
 s9_165nm_52 = Run(path + "165 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__14_10_06.txt")
+s9_165nm_52.change_theta_i(50)
 s9_165nm_60 = Run(path + "165 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__14_03_03.txt") 
+s9_165nm_60.change_theta_i(58)
 s9_165nm_67 = Run(path + "165 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__13_56_29.txt")
+s9_165nm_67.change_theta_i(66)
 s9_165nm_75 = Run(path + "165 nm measurements\\Power and sample 9 reflectivity measurements\\2018_12_06__13_49_07.txt")
+s9_165nm_75.change_theta_i(74)
 
 path_run3 = "3rd Xenon Run Measurements\\" # Any kind of correction for drifting power? Strongest in 3rd run
 s9_r3_lowp_30 = Run(path_run3 + "Sample 9, 0.2 barg\\2018_12_20__10_53_38.txt")
@@ -229,31 +258,13 @@ s2_r3_hip_67.change_theta_i(67)
 s2_r3_hip_75 = Run(path_run3 + "Sample 2, 1.4 barg\\2018_12_19__19_12_01.txt")
 s2_r3_hip_75.change_theta_i(75)
 
-runs = [s9_400nm_30,s9_400nm_45,s9_400nm_52,s9_400nm_60,s9_400nm_67,s9_400nm_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75]#[s2_r3_hip_30,s2_r3_hip_45,s2_r3_hip_52,s2_r3_hip_60,s2_r3_hip_67,s2_r3_hip_75]#[s9_r3_lowp_30,s9_r3_lowp_45,s9_r3_lowp_52,s9_r3_lowp_60,s9_r3_lowp_67,s9_r3_lowp_75]#[s9_lowp_above_30,s9_lowp_above_45,s9_lowp_above_52,s9_lowp_above_60,s9_lowp_above_67,s9_lowp_above_75]#[s9_bubbles_30,s9_bubbles_45,s9_bubbles_52,s9_bubbles_60,s9_bubbles_67,s9_bubbles_75]#[s9_lowp_30,s9_lowp2_30,s9_medp_30,s9_medp2_30,s9_hip_30,s9_hip2_30]#[s9_medp2_30,s9_medp2_45,s9_medp2_52,s9_medp2_60,s9_medp2_67,s9_medp2_75,s9_hip2_30,s9_hip2_45,s9_hip2_52,s9_hip2_60,s9_hip2_67,s9_hip2_75]#[s9_lowp2_30,s9_lowp2_45,s9_lowp2_52,s9_lowp2_60,s9_lowp2_67,s9_lowp2_75,s9_medp2_30,s9_medp2_45,s9_medp2_52,s9_medp2_60,s9_medp2_67,s9_medp2_75,s9_hip2_30,s9_hip2_45,s9_hip2_52,s9_hip2_60,s9_hip2_67,s9_hip2_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75,s9_lowp_above_30,s9_lowp_above_45,s9_lowp_above_52,s9_lowp_above_60,s9_lowp_above_67,s9_lowp_above_75]#[s9_lowp_75,s9_medp_75,s9_hip_75]#[s9_medp_30,s9_medp_45,s9_medp_52,s9_medp_60,s9_medp_67,s9_medp_75,s9_hip_30,s9_hip_45,s9_hip_52,s9_hip_60,s9_hip_67,s9_hip_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75,s9_medp_30,s9_medp_45,s9_medp_52,s9_medp_60,s9_medp_67,s9_medp_75,s9_hip_30,s9_hip_45,s9_hip_52,s9_hip_60,s9_hip_67,s9_hip_75]#[s9_nobubbles_30,s9_nobubbles_45,s9_nobubbles_52,s9_nobubbles_60,s9_nobubbles_67,s9_nobubbles_75,s9_getter_30,s9_getter_45,s9_getter_52,s9_getter_60,s9_getter_67,s9_getter_75]#[s9_first_30,s9_first_45,s9_first_52,s9_first_60,s9_first_67,s9_first_75,s9_nobubbles_30,s9_nobubbles_45,s9_nobubbles_52,s9_nobubbles_60,s9_nobubbles_67,s9_nobubbles_75]#
-labels=["30 degrees","45 degrees","52 degrees","60 degrees", "67 degrees", "75 degrees"]#,"30 degrees","45 degrees","52 degrees","60 degrees", "67 degrees", "75 degrees"]#["0.2 barg","0.2 barg fixed","1.0 barg","1.0 barg fixed","1.5 barg","1.5 barg fixed"]#["1.0 barg, 30 deg","1.0 barg, 45 deg","1.0 barg, 52 deg","1.0 barg, 60 deg","1.0 barg, 67 deg","1.0 barg, 75 deg","1.5 barg, 30 deg","1.5 barg, 45 deg","1.5 barg, 52 deg","1.5 barg, 60 deg","1.5 barg, 67 deg","1.5 barg, 75 deg"]#["0.2 barg, 30 deg","0.2 barg, 45 deg","0.2 barg, 52 deg","0.2 barg, 60 deg","0.2 barg, 67 deg","0.2 barg, 75 deg","1.0 barg, 30 deg","1.0 barg, 45 deg","1.0 barg, 52 deg","1.0 barg, 60 deg","1.0 barg, 67 deg","1.0 barg, 75 deg","1.5 barg, 30 deg","1.5 barg, 45 deg","1.5 barg, 52 deg","1.5 barg, 60 deg","1.5 barg, 67 deg","1.5 barg, 75 deg"]#["center, 30 deg","center, 45 deg","center, 52 deg","center, 60 deg","center, 67 deg","center, 75 deg","1/8\" above, 30 deg","1/8\" above, 45 deg","1/8\" above, 52 deg","1/8\" above, 60 deg","1/8\" above, 67 deg","1/8\" above, 75 deg"]#["0.2 barg","1.0 barg","1.5 barg"]#["1.0 barg, 30 deg","1.0 barg, 45 deg","1.0 barg, 52 deg","1.0 barg, 60 deg","1.0 barg, 67 deg","1.0 barg, 75 deg","1.5 barg, 30 deg","1.5 barg, 45 deg","1.5 barg, 52 deg","1.5 barg, 60 deg","1.5 barg, 67 deg","1.5 barg, 75 deg"]#["0.2 barg, 30 deg","0.2 barg, 45 deg","0.2 barg, 52 deg","0.2 barg, 60 deg","0.2 barg, 67 deg","0.2 barg, 75 deg","1.0 barg, 30 deg","1.0 barg, 45 deg","1.0 barg, 52 deg","1.0 barg, 60 deg","1.0 barg, 67 deg","1.0 barg, 75 deg","1.5 barg, 30 deg","1.5 barg, 45 deg","1.5 barg, 52 deg","1.5 barg, 60 deg","1.5 barg, 67 deg","1.5 barg, 75 deg"]#["30 deg","45 deg","52 deg","60 deg","67 deg","75 deg"]#["before getter, 30 deg", "before getter, 45 deg", "before getter, 52 deg", "before getter, 60 deg", "before getter, 67 deg", "before getter, 75 deg", "after getter, 30 deg", "after getter, 45 deg", "after getter, 52 deg", "after getter, 60 deg", "after getter, 67 deg", "after getter, 75 deg"]#["75 degrees"]#["run 1, 30 deg", "run 1, 45 deg", "run 1, 52 deg", "run 1, 60 deg", "run 1, 67 deg", "run 1, 75 deg", "run 2, 30 deg", "run 2, 45 deg", "run 2, 52 deg", "run 2, 60 deg", "run 2, 67 deg", "run 2, 75 deg"]#
+runs = [s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75]#[s5_30,s5_45,s5_52,s5_60,s5_67,s5_75]#[s8_30,s8_45,s8_52,s8_60,s8_67,s8_75]#[s9_220nm_30,s9_220nm_45,s9_220nm_52,s9_220nm_60,s9_220nm_67,s9_220nm_75]#[s2_r3_hip_30,s2_r3_hip_45,s2_r3_hip_52,s2_r3_hip_60,s2_r3_hip_67,s2_r3_hip_75]#[s9_r3_lowp_30,s9_r3_lowp_45,s9_r3_lowp_52,s9_r3_lowp_60,s9_r3_lowp_67,s9_r3_lowp_75]#[s9_lowp_above_30,s9_lowp_above_45,s9_lowp_above_52,s9_lowp_above_60,s9_lowp_above_67,s9_lowp_above_75]#[s9_bubbles_30,s9_bubbles_45,s9_bubbles_52,s9_bubbles_60,s9_bubbles_67,s9_bubbles_75]#[s9_lowp_30,s9_lowp2_30,s9_medp_30,s9_medp2_30,s9_hip_30,s9_hip2_30]#[s9_medp2_30,s9_medp2_45,s9_medp2_52,s9_medp2_60,s9_medp2_67,s9_medp2_75,s9_hip2_30,s9_hip2_45,s9_hip2_52,s9_hip2_60,s9_hip2_67,s9_hip2_75]#[s9_lowp2_30,s9_lowp2_45,s9_lowp2_52,s9_lowp2_60,s9_lowp2_67,s9_lowp2_75,s9_medp2_30,s9_medp2_45,s9_medp2_52,s9_medp2_60,s9_medp2_67,s9_medp2_75,s9_hip2_30,s9_hip2_45,s9_hip2_52,s9_hip2_60,s9_hip2_67,s9_hip2_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75,s9_lowp_above_30,s9_lowp_above_45,s9_lowp_above_52,s9_lowp_above_60,s9_lowp_above_67,s9_lowp_above_75]#[s9_lowp_75,s9_medp_75,s9_hip_75]#[s9_medp_30,s9_medp_45,s9_medp_52,s9_medp_60,s9_medp_67,s9_medp_75,s9_hip_30,s9_hip_45,s9_hip_52,s9_hip_60,s9_hip_67,s9_hip_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75,s9_medp_30,s9_medp_45,s9_medp_52,s9_medp_60,s9_medp_67,s9_medp_75,s9_hip_30,s9_hip_45,s9_hip_52,s9_hip_60,s9_hip_67,s9_hip_75]#[s9_nobubbles_30,s9_nobubbles_45,s9_nobubbles_52,s9_nobubbles_60,s9_nobubbles_67,s9_nobubbles_75,s9_getter_30,s9_getter_45,s9_getter_52,s9_getter_60,s9_getter_67,s9_getter_75]#[s9_first_30,s9_first_45,s9_first_52,s9_first_60,s9_first_67,s9_first_75,s9_nobubbles_30,s9_nobubbles_45,s9_nobubbles_52,s9_nobubbles_60,s9_nobubbles_67,s9_nobubbles_75]#
+labels=[r"$\theta_i=30^{\circ}$","45$^{\circ}$","52$^{\circ}$","60$^{\circ}$", "67$^{\circ}$", "75$^{\circ}$"]#,"30 degrees","45 degrees","52 degrees","60 degrees", "67 degrees", "75 degrees"]
 
 # Plot BRIDF data
-sample_name="LZ skived"
-plot_runs(runs, title=sample_name+" in 0.2 barg LXe, 400 nm", log=True, labels=labels, include_legend=True, errorbars=True, legend_loc=0)
+sample_name="LZ Skived"
+plot_runs(runs, title=sample_name+" in 0.2 barg LXe, 178 nm", log=True, labels=labels, include_legend=True, errorbars=True, legend_loc=0)
 # plot_runs(runs, title=sample_name+" in 0.2 barg LXe, 400 nm", log=True, labels=labels, include_legend=True, errorbars=True, legend_loc=0)
-# plt.text(0.88,0.88,r"$75^{\circ}$",transform=plt.gca().transAxes,fontsize=13) # Positions for s9 low_p
-# plt.text(0.85,0.78,r"$67^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
-# plt.text(0.8,0.62,r"$60^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
-# plt.text(0.8,0.48,r"$52^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
-# plt.text(0.8,0.38,r"$45^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
-# plt.text(0.7,0.25,r"$30^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
-# plt.text(0.88,0.84,r"$75^{\circ}$",transform=plt.gca().transAxes,fontsize=13) # Positions for low_p2 and hi_p2
-# plt.text(0.85,0.72,r"$67^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
-# plt.text(0.8,0.53,r"$60^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
-# plt.text(0.8,0.38,r"$52^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
-# plt.text(0.8,0.26,r"$45^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
-# plt.text(0.7,0.16,r"$30^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
-# plt.text(0.88,0.84,r"$75^{\circ}$",transform=plt.gca().transAxes,fontsize=13) # Positions for hi_p
-# plt.text(0.85,0.72,r"$67^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
-# plt.text(0.78,0.52,r"$60^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
-# plt.text(0.78,0.3,r"$52^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
-# plt.text(0.67,0.16,r"$45^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
-# plt.text(0.1,0.4,r"$30^{\circ}$",transform=plt.gca().transAxes,fontsize=13)
 t0=time.time()
 
 # Fit data
@@ -263,7 +274,8 @@ t0=time.time()
 # tmp1=np.arange(10)
 # tmp2=np.arange(4,14)
 # print(tmp1,tmp2,np.linspace(tmp1,tmp2,1))
-fit_params = fit_parameters(get_independent_variables_and_relative_intensities(runs),p0=[.8, 2.0, .1, 5.0, 1.0],average_angle=4, precision=.25, sigma_theta_i=-1, use_errs=True,use_spike=False, use_nu=False,bounds=([0.1,1.4,0.03,3.,0.3],[1.6,2.6,0.6,50.,1.7]))
+fit_params = fit_parameters(get_independent_variables_and_relative_intensities(runs),p0=[.8, 1.57, .1, 0.1, 1.0],average_angle=4, precision=.25, sigma_theta_i=-1, use_errs=True,use_spike=True, use_nu=False,bounds=([0.1,1.4,0.03,0.01,0.3],[1.6,2.6,0.6,50.,1.7]))
+# fit_params = [0.8, 1.586, .106, 0.1]
 # fit_params = fit_parameters(get_independent_variables_and_relative_intensities(runs),p0=[1.1,1.55,.2,5.],average_angle=4, precision=.25, sigma_theta_i=2, use_errs=True,use_spike=False,bounds=([0.7,1.4,0.04,3.],[1.7,1.8,0.3,50.]))#[0.5,1.4,0.04,5.0],[1.2,1.8,0.3,50.]#[0.5,1.4,0.1],[1.0,1.8,0.3]#[0.01,1.01,0.05],[2.0,3.0,0.5]
 #fit_params_ang = fit_parameters_and_angle(get_independent_variables_and_relative_intensities(runs),average_angle=4.)
 #fit_ang = fit_params_ang[0]
@@ -283,6 +295,15 @@ fit_params_s8=[1.30037846657779, 1.5481537596293447, 0.060365408007835346, 4.900
 fit_params_s9_400nm=[0.6916903132118614, 1.7685668238585814, 0.052664172718245646]
 fit_params_s9_400nm_nrange_0_15=[0.6414663099143563, 2.0285416875437416, 0.2071409460435925]
 # fit_params=fit_params_lowp_nrange_0_12
+# Fitter parameters for s9 in LXe, 2.00 soid angle, BC, power correction 0.753
+fit_params_s9_lowp_corr_nrange_0_15=[0.8098340929026058, 1.5651721053377226, 0.1117946993003091]
+fit_params_s9_lowp_corr_nshift_test_baseline= [0.8183356225312042, 1.5601049089803896, 0.12244840433937525]
+# fit_params=fit_params_s9_lowp_corr_nshift_test_baseline
+fit_params_s9_lowp2_corr_nrange_0_15=[0.9001033317655373, 1.5675280902284154, 0.11370369845973141]
+# Fitter parameters for s8 in LXe, 2.00 soid angle, BC, power correction 0.753
+fit_params_s8_lowp_corr_nrange_0_15=[0.9427456100375428, 1.5664201944697242, 0.08352285569818733, 3.9498103310586443]
+fit_params_s8_lowp_corr_nrange_0_15_avg_5deg=[0.9402613669832427, 1.5664520623940574, 0.06270405048987444, 4.025893124659275]
+# fit_params=fit_params_s8_lowp_corr_nrange_0_15_avg_5deg
 # Fitter parameters for s9 in LXe, 3rd run, 2.00 solid angle factor, BC model
 fit_params_r3_s9_lowp= [1.0216459850600514, 1.5467069707623793, 0.1101614104957136]
 # fit_params=fit_params_r3_s9_lowp
@@ -317,12 +338,12 @@ sigma_theta_i=-1
 precision=.25
 average_angle=4
 # plot_TSTR_fit(20., n_LXe_178, fit_params, color="r", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-plot_TSTR_fit(28., n_LXe_178, fit_params, color="r", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-plot_TSTR_fit(43., n_LXe_178, fit_params, color="g", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-plot_TSTR_fit(52., n_LXe_178, fit_params, color="b", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-plot_TSTR_fit(58., n_LXe_178, fit_params, color="m", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-plot_TSTR_fit(65, n_LXe_178, fit_params, color="c", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-plot_TSTR_fit(73, n_LXe_178, fit_params, color="y", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(29., n_LXe_178, fit_params, color="r", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(47., n_LXe_178, fit_params, color="g", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(53., n_LXe_178, fit_params, color="b", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(59, n_LXe_178, fit_params, color="m", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(67, n_LXe_178, fit_params, color="c", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(75, n_LXe_178, fit_params, color="y", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
 # plot_TSTR_fit(75., n_LXe_178, fit_params, color="y", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i,phi_r=5)
 # plot_TSTR_fit(75., n_LXe_178, fit_params, color="y", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i,phi_r=10)
 #plt.text(0.1,0.1,r"Fit: $\rho_L$={0:.3f}, n={1:.2f}, $\gamma$={2:.3f}".format(*fit_params),transform=plt.gca().transAxes,fontsize=13)
@@ -333,10 +354,15 @@ print("Plotting time: {0}".format(t2-t1))
 # Try averaging over multiple indices
 # plot_runs(runs, title=sample_name+" in 0.2 barg LXe, 165 nm", log=True, labels=labels, include_legend=True, errorbars=True, legend_loc=0, figure=True)
 
-
-# run_data=get_independent_variables_and_relative_intensities(runs)
-# chi_sq=chi_squared(run_data[0], run_data[1], run_data[2], fit_params, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-# print("Chi squared from fit: ",chi_sq)
+for ii in range(len(runs)):
+	run_data=get_independent_variables_and_relative_intensities(runs[ii])
+	chi_sq=chi_squared(run_data[0], run_data[1], run_data[2], fit_params, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+	print("Chi squared from fit, "+labels[ii]+": ",chi_sq)
+	
+run_data=get_independent_variables_and_relative_intensities(runs)
+chi_sq=chi_squared(run_data[0], run_data[1], run_data[2], fit_params, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+print("Chi squared from fit: ",chi_sq)
+plt.text(0.3,0.9,r"F=1/(1+exp(-x)), $\chi^2$={0:.2f}".format(chi_sq),transform=plt.gca().transAxes,fontsize=13)
 
 # Profiling in 3D is expensive, unnecessary when variables are weakly correlated
 # Separate out into blocks correlated by ~>10%; e.g. do combined 2D profile for n, gamma; then separate 1D profile for rho
@@ -391,6 +417,10 @@ print("Plotting time: {0}".format(t2-t1))
 # y_specular_LXe_lowp=[0.0017275000631306692, 0.0017476375724292414, 0.0018610656328319315, 0.0022948430948827032, 0.007651243849065006, 0.04394224210952713, 0.11074467133765065, 0.3068205025510641, 0.6153235998043434, 0.7629784298122186, 0.8530040361670844, 1.0528088681336794]
 # y_diffuse_LXe_lowp_nrange_0_12 = [0.9241829143644459, 0.9241468889960962, 0.9240787598471459, 0.9238504970970207, 0.9216890931525608, 0.9119557742592572, 0.8899549445268882, 0.5903236321522066, 0.26568393272061674, 0.11483593779759056, 0.06235568461855687, 0.03979878583818896]
 # y_specular_LXe_lowp_nrange_0_12 =  [0.0017036874347853338, 0.0017235345857333317, 0.0018352543890812374, 0.002261999394083116, 0.008492343244381738, 0.04342943475762406, 0.1124622878735221, 0.29591521525792086, 0.5473931732412308, 0.7276610603448042, 0.8337474320040098, 1.0344270398761855]
+# y_diffuse_LXe_lowp_corr_nrange_0_15 = [0.6849844088090226, 0.6849516137424515, 0.6848980276446702, 0.6847429162132819, 0.6833829882810474, 0.6775133737054704, 0.6648755402871067, 0.46715038281764626, 0.2314865916574596, 0.10280210546075348, 0.055122569722441166, 0.034902985796637635]
+# y_specular_LXe_lowp_corr_nrange_0_15 = [0.00146013432719507, 0.001478443859610552, 0.0015779403159794014, 0.0019483216615979846, 0.007657043665555211, 0.03925621759438618, 0.10069087274728164, 0.25351695587136364, 0.4636921738221411, 0.6502541779199938, 0.7858725030849131, 1.0104218377702237]
+# y_diffuse_LXe_lowp2_corr_nrange_0_15 = [0.763294497364252, 0.7632567449693723, 0.7631966240341286, 0.7630278394234797, 0.7615748539054874, 0.7553677956586213, 0.7421539873425429, 0.5331105917037516, 0.26671978257084816, 0.1192176914479078, 0.06382869151298011, 0.04017584560718217]
+# y_specular_LXe_lowp2_corr_nrange_0_15 = [0.0014030695227905936, 0.0014208328438786982, 0.0015168243547133834, 0.00187241722987367, 0.007290886116810948, 0.03765159072851764, 0.09632609156169926, 0.24320400471201084, 0.44969889213403996, 0.6368825017639688, 0.7766238762554981, 1.0047942687380587]
 # y_specular_LXe_lowp=[min(x[0],1-x[1]) for x in zip(y_specular_LXe_lowp,y_diffuse_LXe_lowp)]
 # y_total_LXe_lowp = [sum(x) for x in zip(y_specular_LXe_lowp,y_diffuse_LXe_lowp)]
 # y_total_LXe_lowp_full = y_total_LXe_lowp[:]
@@ -423,6 +453,8 @@ print("Plotting time: {0}".format(t2-t1))
 # # # y_diffuse_LXe_hip2= [0.7116527697234036, 0.7138323922133201, 0.7167431409327432, 0.7206668394297263, 0.729091743241813, 0.7335885883463384, 0.7262823707645063, 0.6474078491699706, 0.0, 0.0, 0.0, 0.0]
 # # # y_specular_LXe_hip2=  [0.0016528720786998794, 0.0016884735251564945, 0.001857732976822431, 0.0024483848517261844, 0.009600045662265523, 0.06251613539473333, 0.13418304588129548, 0.25679333990263276, 0.4159533052261603, 0.5728408076108408, 0.7414240888009019, 1.0]#1.1194372218351034]
 # # # y_total_LXe_hip2 = [sum(x) for x in zip(y_specular_LXe_hip2,y_diffuse_LXe_hip2)]
+# y_diffuse_LXe_s8_lowp_corr_nrange_0_15_avg_5deg = [0.8017796267007459, 0.8017684625339829, 0.8017352112065645, 0.8015897500538604, 0.8001009901884555, 0.7934880233354094, 0.7792406093909442, 0.5542014870444953, 0.2257014237606343, 0.07370467156411019, 0.03699734732934129, 0.022905381919653186]
+# y_specular_LXe_s8_lowp_corr_nrange_0_15_avg_5deg = [0.00142773600440886, 0.0014368159853060235, 0.001501487718275121, 0.0017686947070900182, 0.005310897952563967, 0.02417679572170201, 0.06737109246784116, 0.26669457614261605, 0.5622565793863318, 0.8284511674732585, 0.9687327632248928, 1.1205957885096496]
 
 # plt.plot(x, y_diffuse, label="diffuse")
 # plt.plot(x, y_specular, label="specular")

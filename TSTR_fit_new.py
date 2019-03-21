@@ -25,6 +25,10 @@ time_wtot=0
 time_G=0
 time_N=0
 time_F=0
+
+simple_fit = False # Empirical fit, w/ separate scaling and angle shift for specular peak
+theta_crit_simple = 65*np.pi/180 # Just fix to a constant angle for simple fit
+sigmoid_F = False # Uses sigmoid version of F_ (specular peak only) instead of true Fresnel factor
     
 # this function is used in calculating the total reflectance
 def G_calc(theta_r, phi_r, theta_i, n_0, polarization, parameters):
@@ -58,10 +62,10 @@ def F_unpolarized(theta_i, n_0, n):
 
 n_range = 0.001
 
-# assumes unpolarized light
 # takes in a masked array only including where total internal reflection doesn't happen
 # uses algebra to avoid taking the sin and cosines of an arcsin
-def F_single(theta_i, n_0, n, polarization):
+# polarization of 0 means electric field perpendicular to plane of incidence (vertical), 1 is horizontal
+def F_single(theta_i, n_0, n, polarization=0.5):
     c = np.cos(theta_i)
     s = np.sin(theta_i)
     n_ratio = n_0 / n
@@ -72,7 +76,7 @@ def F_single(theta_i, n_0, n, polarization):
     
     return (1-polarization) * s_reflection + polarization * p_reflection
 
-def F_single_no_internal(theta_i, n_0, n, polarization):
+def F_single_no_internal(theta_i, n_0, n, polarization=0.5):
     c = np.cos(theta_i)
     s = np.sin(theta_i)
     n_ratio = n_0 / n
@@ -102,6 +106,27 @@ def F(theta_i, n_0, n, polarization=0.5):
     non_tir_array = F_single_no_internal(theta_i, n_0, n_center_no_tir, polarization)* non_tir_frac # multiplies fresnel factor by fraction of n values represented by n_center
     return np.add(tir_frac, non_tir_array)
 
+def F_sigmoid(theta_i, n_0, n, beta=1):
+    if n<n_0:
+        theta_shift = 0#0.3*(theta_i-60*np.pi/180)/(np.pi/2)# 5*np.pi/180 # Can shift point where F=0.5, since critical angle is actually at F=1
+        theta_crit = np.minimum(np.arcsin(n/n_0)+theta_shift, np.pi/2)
+    else:
+        theta_crit = np.pi/2
+    x = (theta_i-theta_crit)/beta
+    return F_log(x)
+	
+def F_erf(x):
+	return 0.5*(1+scipy.special.erf(x))
+	
+def F_log(x):
+	return 1/(1+np.exp(-x))
+	
+def F_arctan(x):
+    return 0.5*(1+(2/np.pi)*np.arctan(x))
+	
+def F_abs(x):
+    return 0.5*(1+x/(1+abs(x)))
+	
 # heaviside step function
 def H(x):
     return 0.5 * (np.sign(x) + 1)
@@ -204,20 +229,35 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
     t0=time.time()
     rho_L = parameters[0]
     n = parameters[1]
+	# For testing linear shift of n (or gamma) w/ incident angle
+    #n = parameters[1] - (np.mean(theta_i)-60*np.pi/180)*(0.0001/7)*180/np.pi
     gamma = parameters[2]
+    # gamma = parameters[2] - (np.mean(theta_i)-60*np.pi/180)*(0.0001/7)*180/np.pi
+	
+    nu = 1.0
+    if len(parameters)>4:
+        if parameters[4] > 0: nu = parameters[4]
 
+    # In simple fit, fourth parameter is exp of shift in theta_r (for specular peak only) rather than K; allows for a shift in the specular peak
+    if simple_fit and len(parameters)>3: 
+        if parameters[3] > 0:
+            d_theta = np.log(parameters[3]) # this parameter is fixed to the range (0,inf); log allows it to span (-inf,inf)
+            theta_r_spec = theta_r + d_theta
+    else:
+        theta_r_spec = theta_r
+	
     # Local angle, relative to microfacet; from page 85 of Claudio's thesis
-    theta_prime = 0.5 * np.arccos(np.cos(theta_i) * np.cos(theta_r) -
-        np.sin(theta_i) * np.sin(theta_r) * np.cos(phi_r))
+    theta_prime = 0.5 * np.arccos(np.cos(theta_i) * np.cos(theta_r_spec) -
+        np.sin(theta_i) * np.sin(theta_r_spec) * np.cos(phi_r))
 
     theta_i_prime = theta_prime
     theta_r_prime = theta_prime
 
     # Trowbridge-Reitz micro-facet angle distribution, p. 88 of Claudio's thesis; normalized w/o shadowing/masking factor G in integral
-    # def P(alpha_):
-        # return np.power(gamma, 2) / \
-               # (np.pi * np.power(np.cos(alpha_), 4) *
-               # np.power(np.power(gamma, 2) + np.power(np.tan(alpha_), 2), 2))
+    def P(alpha_):
+        return np.power(gamma, 2) / \
+               (np.pi * np.power(np.cos(alpha_), 4) *
+               np.power(np.power(gamma, 2) + np.power(np.tan(alpha_), 2), 2))
 
     # Cook-Torrance distribution, p. 87
     # def P(alpha_):
@@ -231,20 +271,21 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
         # return (1.3981*gamma_prime+0.13) / (np.pi*gamma_prime**2*(1+(np.tan(alpha_)/gamma_prime)**2))
             
     # Bivariate-Cauchy distribution, from Claudio; distribution is normalized
-    def P(alpha_):
-        gamma_prime = gamma*0.74 # scale so that this gamma is similar to gamma in CT and TR distributions
-        return gamma_prime*(gamma_prime+1)/(2*np.pi*np.cos(alpha_)**3*(gamma_prime**2+np.tan(alpha_)**2)**(3/2))
-            
+    # def P(alpha_):
+        # gamma_prime = gamma*0.74 # scale so that this gamma is similar to gamma in CT and TR distributions
+        # return gamma_prime*(gamma_prime+1)/(2*np.pi*np.cos(alpha_)**3*(gamma_prime**2+np.tan(alpha_)**2)**(3/2))
+	
     # Check probably unnecessary; if cos errors pop up, will have to fix to work for arrays 
     # if theta_i == theta_r:
         # alpha_specular = 0
     # else:
-        # alpha_specular = np.arccos((np.cos(theta_i) + np.cos(theta_r)) / (2 * np.cos(theta_i_prime)))
+        # alpha_specular = np.arccos((np.cos(theta_i) + np.cos(theta_r_spec)) / (2 * np.cos(theta_i_prime)))
     # Micro-facet angle for reflection into angle theta_r, also from p. 85
-    alpha_specular = np.arccos((np.cos(theta_i) + np.cos(theta_r)) / (2 * np.cos(theta_i_prime)))
+    # print(d_theta*180/np.pi,theta_r_spec*180/np.pi,theta_i*180/np.pi,(np.cos(theta_i) + np.cos(theta_r_spec)) / (2 * np.cos(theta_i_prime)))
+    alpha_specular = np.arccos((np.cos(theta_i) + np.cos(theta_r_spec)) / (2 * np.cos(theta_i_prime)))
 
     P_ = P(alpha_specular)
-
+	
     # print("theta_i_mean: {0:g}, theta_r_mean: {1:g}".format(np.mean(theta_i)*180/np.pi,np.mean(theta_r)*180/np.pi))
     t1=time.time()
     
@@ -284,6 +325,15 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
             W_sum += np.sum(P(alpha_range)*np.sin(alpha_range)*np.cos(alpha_range)*d_alpha*dphi_alpha)
         return W_sum
     
+	
+    if simple_fit: # diffuse is just Lambertian; specular is P, w/ arbitrary scaling from n/n_0 and peak shift from d_theta
+        W = 1
+        #W = W_crit(theta_r, theta_crit, polarization=0.5) 
+        if np.mean(theta_r) > theta_crit_simple:
+           W = W_crit(theta_r, theta_crit_simple, polarization=0.5) 
+        return [ nu * np.log(n/n_0) * P_ / (4 * np.cos(theta_i)),
+        nu * W * rho_L / np.pi * np.cos(theta_r)] #[0., nu * rho_L / np.pi * np.cos(theta_r)]#
+	
     # Incident part of W, W_i
     if np.size(theta_i) > 1:
         # W_i = 1 - F(theta_i, n_0, n, polarization) # Use this if skipping W_crit calculation 
@@ -299,7 +349,7 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
             W_i = W_crit(theta_i, theta_crit, polarization)
             #W_i = 1 - F(theta_i, n_0, n, polarization)
         else:
-           W_i = 1 - F(theta_i, n_0, n, polarization) 
+           W_i = 1 - F(theta_i, n_0, n, polarization) #F_sigmoid(theta_i, n_0, n, beta)#
     tw1=time.time()
     # Operating on masked arrays is slow; only use them if needed (inputs are arrays)
     if np.size(theta_r) > 1: # Have to use masks
@@ -423,13 +473,20 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
     t4=time.time()
             
     # Use Fresnel factor relative to local angle theta_i_prime
-    F_ = F(theta_i_prime, n_0, n, polarization)
-
+    if not sigmoid_F:
+        F_ = F(theta_i_prime, n_0, n, polarization)
+    else: # Use sigmoid version of F instead of true Fresnel factor, with width given by fourth parameter
+        beta=1
+        if len(parameters)>3: beta = parameters[3]
+        F_ = F_sigmoid(theta_i_prime, n_0, n, beta)
+        #F_ = np.maximum(F_, 0.0005*np.exp(4*np.mean(theta_i)))#.005)#np.mean(theta_i)
+	
     t5=time.time()
     
     # add specular spike, if parameters length >3
     specular_delta=0
-    if len(parameters)>3:    
+    C = 0
+    if len(parameters)>3 and not sigmoid_F:    
         K = parameters[3]
         if K > 0:
             # this is where it differs from semi-empirical fit, Lambda was slightly different 
@@ -441,9 +498,6 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
             is_specular = np.logical_and(is_theta_spec, is_phi_spec)
             #print(is_specular)
             specular_delta = is_specular/precision**2 # only one point in grid is non-zero; magnitude scales w/ grid size to preserve average
-        else: C = 0
-    else:
-        C = 0
     
     # Empirical addition of error function to specular lobe, for data in LXe
     # theta_cutoff = 67
@@ -467,12 +521,6 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
     time_N+=t4-t3
     time_F+=t5-t4
     # print("W_i time: {0}, W_o time: {1}, W tot time: {2}, G time: {3}, N time: {4}, F time: {5}".format(time_w1, time_w2, time_wtot, time_G, time_N, time_F))
-	
-    if len(parameters)>4:
-        if parameters[4] > 0: nu = parameters[4]
-        else: nu = 1.0
-    else:
-        nu = 1.0
     
     # Semi-empirical formula from p. 121
     # specular component is split into specular lobe w/ normalization=1-C and specular spike w/ normalization=C
@@ -814,7 +862,10 @@ def reflectance(theta_i_in_degrees, n_0, polarization, parameters):
 
     def BRIDF_int(theta_r, phi_r):
         # solid angle not used here
-        G = G_calc(theta_r, phi_r, theta_i, n_0, polarization, parameters)
+        if not simple_fit:
+            G = G_calc(theta_r, phi_r, theta_i, n_0, polarization, parameters)
+        else:
+            G = 1
         # precision=-1 ensures that specular spike isn't included, though it may modify specular lobe normalization if parameters include K
         # will add specular spike by hand, since integration won't have a fixed grid, so ensuring a real delta function is difficult
         # sin(theta_r) is from solid angle, G is to correct for the fact that shadowed/masked light ends up reflected, see eq. 16 of Silva 2009 Xe scintillation
@@ -840,12 +891,19 @@ def reflectance_diffuse(theta_i_in_degrees, n_0, polarization, parameters):
 
     a = lambda x: 0 # Limits for theta_r
     b = lambda x: np.pi / 2
-    if n_0 > parameters[1]:
-        th_crit = lambda x: np.arcsin(parameters[1]/n_0)
+
+    if n_0 > parameters[1] and not simple_fit:
+        th_crit = np.arcsin(parameters[1]/n_0)
+    if simple_fit:
+        th_crit = theta_crit_simple
+    th_crit_func = lambda x: th_crit
 
     def BRIDF_int(theta_r, phi_r):
         # solid angle not used here
-        G = G_calc(theta_r, phi_r, theta_i, n_0, polarization, parameters)
+        if not simple_fit:
+            G = G_calc(theta_r, phi_r, theta_i, n_0, polarization, parameters)
+        else:
+            G = 1
         # sin(theta_r) is from solid angle, G is to correct for the fact that shadowed/masked light ends up reflected, see eq. 16 of Silva 2009 Xe scintillation
         # Ideally, P is normalized with G in the integral, but none of the models we use do this 
         return BRIDF_diffuse(theta_r, phi_r, theta_i, n_0, polarization, parameters) * np.sin(theta_r) / G
@@ -856,14 +914,14 @@ def reflectance_diffuse(theta_i_in_degrees, n_0, polarization, parameters):
     # plt.plot(theta_r_list,BRIDF_list )
     # plt.plot(theta_r_list,G_list )
     # plt.show()
-    if n_0 > parameters[1]: # If we have total internal reflection, break up integral into part below and above critical angle
+    if n_0 > parameters[1] or simple_fit: # If we have total internal reflection, break up integral into part below and above critical angle
         # int_1d=scipy.integrate.quad(BRIDF_int,0,np.pi/2,0,full_output=1,epsrel=1e-5,epsabs=1e-5,limit=10)[0]*2*np.pi
         # print("Integral based off of phi_r=0: ",int_1d)
-        integral_results_below = scipy.integrate.dblquad(BRIDF_int, -np.pi, np.pi, a, th_crit)
+        integral_results_below = scipy.integrate.dblquad(BRIDF_int, -np.pi, np.pi, a, th_crit_func)
         #integral_results_above = scipy.integrate.dblquad(BRIDF_int, -np.pi, np.pi, th_crit_plus, b) #dblquad doesn't like W_crit
         phi_r_list = np.linspace(-np.pi,np.pi,30) # Not a strong function of phi_r, so few points are needed
         d_phi = np.pi*2/30
-        one_d_int_results_above = [scipy.integrate.quad(BRIDF_int,np.arcsin(parameters[1]/n_0),np.pi/2,phi,full_output=1,epsrel=1e-5,epsabs=1e-5,limit=10) for phi in phi_r_list]
+        one_d_int_results_above = [scipy.integrate.quad(BRIDF_int,th_crit,np.pi/2,phi,full_output=1,epsrel=1e-5,epsabs=1e-5,limit=10) for phi in phi_r_list]
         one_d_ints_above = [int_result[0] for int_result in one_d_int_results_above]
         #print("Integrals for each slice in phi_r: ", one_d_ints_above)
         # print("Number of function evaluations in first integral: ",one_d_int_results_above[0][2]['neval'])
@@ -889,15 +947,18 @@ def reflectance_specular(theta_i_in_degrees, n_0, polarization, parameters):
     b = lambda x: np.pi / 2
 
     def BRIDF_int(theta_r, phi_r):
-        G = G_calc(theta_r, phi_r, theta_i, n_0, polarization, parameters)
+        if not simple_fit:
+            G = G_calc(theta_r-1e-8, phi_r, theta_i, n_0, polarization, parameters)
+        else:
+            G = 1
         # precision=-1 ensures that specular spike isn't included, though it may modify specular lobe normalization if parameters include K
         # will add specular spike by hand, since integration won't have a fixed grid, so ensuring a real delta function is difficult
         # sin(theta_r) is from solid angle, G is to correct for the fact that shadowed/masked light ends up reflected, see eq. 16 of Silva 2009 Xe scintillation
         # Ideally, P is normalized with G in the integral, but none of the models we use do this 
-        return BRIDF_specular(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision=-1) * np.sin(theta_r) / G 
+        return BRIDF_specular(theta_r-1e-8, phi_r, theta_i, n_0, polarization, parameters, precision=-1) * np.sin(theta_r) / G 
 
     spec_spike = 0
-    if len(parameters)>3:
+    if len(parameters)>3 and not simple_fit:
         n=parameters[1]
         K=parameters[3]
         C = specular_spike_norm(theta_i, theta_i, K)

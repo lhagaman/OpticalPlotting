@@ -78,20 +78,12 @@ s9_lowp_30 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_52_04.txt")
 s9_lowp_30.change_theta_i(30)
 s9_lowp_45 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_47_09.txt")
 s9_lowp_52 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_42_21.txt")
-s9_lowp_52.change_theta_i(53)
+s9_lowp_52.change_theta_i(52)
 s9_lowp_60 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_37_31.txt")
 s9_lowp_60.change_theta_i(60) 
 s9_lowp_67 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_32_47.txt")
-s9_lowp_67.change_theta_i(68)
-s9_lowp_65 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_32_47.txt")
-s9_lowp_65.change_theta_i(66)
-s9_lowp_69 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_32_47.txt")
-s9_lowp_69.change_theta_i(69)
+s9_lowp_67.change_theta_i(67)
 s9_lowp_75 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_27_55.txt")
-s9_lowp_73 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_27_55.txt")
-s9_lowp_73.change_theta_i(74)
-s9_lowp_77 = Run(path + "Sample 9 lower pressure\\2018_12_05__13_27_55.txt")
-s9_lowp_77.change_theta_i(76.001)
 s9_lowp2_30 = Run(path + "Sample 9 lower pressure 2\\2018_12_07__13_28_41.txt")
 s9_lowp2_45 = Run(path + "Sample 9 lower pressure 2\\2018_12_07__13_23_51.txt")
 s9_lowp2_52 = Run(path + "Sample 9 lower pressure 2\\2018_12_07__13_18_50.txt")
@@ -327,17 +319,16 @@ s2_r3_hip_67.change_theta_i(67)
 s2_r3_hip_75 = Run(path_run3 + "Sample 2, 1.4 barg\\2018_12_19__19_12_01.txt")
 s2_r3_hip_75.change_theta_i(75)
 
-runs =[s9_lowp_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75]#[s9_lowp_67,s9_lowp_75]#[s9_400nm_30,s9_400nm_45,s9_400nm_52,s9_400nm_60,s9_400nm_67,s9_400nm_75]#[s2_r3_hip_30,s2_r3_hip_45,s2_r3_hip_52,s2_r3_hip_60,s2_r3_hip_67,s2_r3_hip_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75]#[s9_r3_lowp_30,s9_r3_lowp_45,s9_r3_lowp_52,s9_r3_lowp_60,s9_r3_lowp_67,s9_r3_lowp_75]#[s9_lowp_above_30,s9_lowp_above_45,s9_lowp_above_52,s9_lowp_above_60,s9_lowp_above_67,s9_lowp_above_75]#[s9_bubbles_30,s9_bubbles_45,s9_bubbles_52,s9_bubbles_60,s9_bubbles_67,s9_bubbles_75]#[s9_lowp_30,s9_lowp2_30,s9_medp_30,s9_medp2_30,s9_hip_30,s9_hip2_30]#[s9_medp2_30,s9_medp2_45,s9_medp2_52,s9_medp2_60,s9_medp2_67,s9_medp2_75,s9_hip2_30,s9_hip2_45,s9_hip2_52,s9_hip2_60,s9_hip2_67,s9_hip2_75]#[s9_lowp2_30,s9_lowp2_45,s9_lowp2_52,s9_lowp2_60,s9_lowp2_67,s9_lowp2_75,s9_medp2_30,s9_medp2_45,s9_medp2_52,s9_medp2_60,s9_medp2_67,s9_medp2_75,s9_hip2_30,s9_hip2_45,s9_hip2_52,s9_hip2_60,s9_hip2_67,s9_hip2_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75,s9_lowp_above_30,s9_lowp_above_45,s9_lowp_above_52,s9_lowp_above_60,s9_lowp_above_67,s9_lowp_above_75]#[s9_lowp_75,s9_medp_75,s9_hip_75]#[s9_medp_30,s9_medp_45,s9_medp_52,s9_medp_60,s9_medp_67,s9_medp_75,s9_hip_30,s9_hip_45,s9_hip_52,s9_hip_60,s9_hip_67,s9_hip_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75,s9_medp_30,s9_medp_45,s9_medp_52,s9_medp_60,s9_medp_67,s9_medp_75,s9_hip_30,s9_hip_45,s9_hip_52,s9_hip_60,s9_hip_67,s9_hip_75]#[s9_nobubbles_30,s9_nobubbles_45,s9_nobubbles_52,s9_nobubbles_60,s9_nobubbles_67,s9_nobubbles_75,s9_getter_30,s9_getter_45,s9_getter_52,s9_getter_60,s9_getter_67,s9_getter_75]#[s9_first_30,s9_first_45,s9_first_52,s9_first_60,s9_first_67,s9_first_75,s9_nobubbles_30,s9_nobubbles_45,s9_nobubbles_52,s9_nobubbles_60,s9_nobubbles_67,s9_nobubbles_75]#
-angles=[75]#[30,45,53,60,68,75]#[67,66,69]#[75,74,76.001]#[30,28,32]#[45,43,47]#[52,51,53]#[60,59,62]#
-labels=[30,45,52,60,67,75]
-fit_params_indiv=[0.711,2.482,0.134]#[[0.841,1.524,0.142], [0.833,1.57,0.382], [0.765,2.23,0.174], [0.711,2.482,0.134], [0.508,4.342,0.078], [0.167,10.108,0.068]]
+runs = [s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75]#[s9_165nm_30, s9_165nm_28, s9_165nm_32] #[s9_400nm_30,s9_400nm_45,s9_400nm_52,s9_400nm_60,s9_400nm_67,s9_400nm_75]#[s2_r3_hip_30,s2_r3_hip_45,s2_r3_hip_52,s2_r3_hip_60,s2_r3_hip_67,s2_r3_hip_75]#
+angles=[30,45,52,60,67,75]#[45,43,47]#[52,51,53]#[60,59,62]#[67,66,69]#[75,74,77]#
+fit_params_simple=[[0.787,1.691,0.044,0.882], [0.757,1.725,0.157,0.944], [0.693,1.792,0.198,0.901], [0.58,1.914,0.147,0.865], [0.283,2.21,0.083,0.928], [0.051,2.47,0.076,1]]
 
 #labels=["30 degrees","45 degrees","52 degrees","60 degrees", "67 degrees", "75 degrees"]#
 colors=["r", "g", "b", "m", "c", "y"]
 
 # Plot BRIDF data
 sample_name="LZ skived"
-plot_runs(runs, title=sample_name+" in 0.2 barg LXe, 178 nm", log=True, include_legend=True, errorbars=True, legend_loc=0)
+plot_runs(runs, title=sample_name+" in 0.2 barg LXe, 178 nm", log=True, include_legend=False, errorbars=True, legend_loc=0)
 y_diffuse=[]
 y_specular=[]
 y_total=[]
@@ -345,70 +336,58 @@ for ii in range(len(runs)):
 	#plt.figure()
 	run_data = get_independent_variables_and_relative_intensities(runs[ii])
 	# plot_runs(runs[ii], title=sample_name+" in 0.2 barg LXe, {0:g} deg, 178 nm".format(angles[ii]), log=True, include_legend=True, errorbars=True, legend_loc=0)
-	#fit_params = fit_parameters(run_data,p0=[1.0, 1.5, .04, 0.1, 1.0],average_angle=4, precision=.25, sigma_theta_i=-1, use_errs=True,use_spike=True, use_nu=False,bounds=([0.1,1.1,0.03,0.01,0.3],[1.6,1.7,0.6,50.,1.7]))
-	fit_params = [.183,1.630,.075,.38]#[.8, 1.4, 0.078]
-	# fit_params = fit_params_indiv[ii]
-
+	if angles[ii]<40: 
+		shift_max = 1.04
+		spec_max = 1.691
+	else: 
+		shift_max = 1.09
+		spec_max = 2.6
+	# Parameters are albedo, specular normalization, gamma, angle shift (last is overall scaling, nu; not needed)
+	fit_params = fit_parameters(run_data,p0=[0.1, np.minimum(1.7,spec_max), .1, 0.9, 1.0],average_angle=-1, precision=-1, sigma_theta_i=-1, use_errs=True, use_spike=True, use_nu=False,bounds=([0.01,1.69+1e-4,0.03,0.84,0.3],[1.6,spec_max,0.6,shift_max,1.7])) # theta_r shift range is +5 to -10 deg
+	#fit_params=fit_params_simple[ii]
+	# fit_params=[.051,2.47,.076,1]
+	
 	print("Fit parameters (rho_L, n, gamma): "+str(fit_params))
 
 	# Plot BRIDF model from fits
 	n_LXe_178 = 1.69
 	sigma_theta_i=-1
-	precision=.25
-	average_angle=4
-	# if ii==0: fit_params=[1.528,1.536,.466]
-	# else: fit_params=[.988,1.651,.348]
+	precision=-1
+	average_angle=-1
 
 	plot_TSTR_fit(angles[ii], n_LXe_178, fit_params, color=colors[ii], average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i, include_fit_text=False)
 
 	chi_sq=chi_squared(run_data[0], run_data[1], run_data[2], fit_params, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
 	print("Chi squared from fit for angle={0} deg: {1:.3f}".format(angles[ii],chi_sq))
-	plt.text(0.02,0.92-.04*ii,str(labels[ii]) + r"$^\circ$: $\rho_L$={0:.3f}, n={1:.3f}, $\gamma$={2:.3f}, K={3:.2f}, $\chi^2$={4:.2f}".format(fit_params[0],fit_params[1],fit_params[2],fit_params[3],chi_sq),transform=plt.gca().transAxes,fontsize=11)
-	plt.xlim(0,85)
-	
+	plt.text(0.02,0.92-.04*ii,str(angles[ii]) + r"$^\circ$: $\rho_L$={0:.3f}, $N_{{sp}}$={1:.3f}, $\gamma$={2:.3f}, $\Delta\theta$={3:.1f}, $\chi^2$={4:.2f}".format(fit_params[0],np.log(fit_params[1]/n_LXe_178),fit_params[2],np.log(fit_params[3])*180/np.pi,chi_sq),transform=plt.gca().transAxes,fontsize=11)
+
 	# Total reflectance calcs
-	# y_diff=reflectance_diffuse(angles[ii], n_LXe_178, 0.5, fit_params)
-	# y_diffuse.append(y_diff)
-	# y_spec=reflectance_specular(angles[ii], n_LXe_178, 0.5, fit_params)
-	# y_specular.append(y_spec)
-	# y_total.append(y_diff+y_spec)
+	y_diff=reflectance_diffuse(angles[ii], n_LXe_178, 0.5, fit_params)
+	y_diffuse.append(y_diff)
+	y_spec=reflectance_specular(angles[ii], n_LXe_178, 0.5, fit_params)
+	y_specular.append(y_spec)
+	y_total.append(y_diff+y_spec)
 
 print("Diffuse reflectances: ",y_diffuse)
 print("Specular reflectances: ",y_specular)
 print("Total reflectances: ",y_total)
 
-y_diffuse_indiv= [0.6677449366590479, 0.6410512423149792, 0.6577679871525651, 0.4441767939777289, 0.28033830767442636, 0.0464811352176091]
-y_specular_indiv=[0.0037109289928223543, 0.007237724178743148, 0.038061412541961714, 0.28299705555878757, 0.2684291636169114, 0.45048580194369625]
-y_total_indiv=[0.67145587, 0.64828897, 0.6958294,  0.72717385, 0.54876747, 0.49696694]
 y_diffuse_simple=[0.787, 0.757, 0.693, 0.580, 0.283, 0.051] # Exactly equals rho in simple case
 y_specular_simple=[0.0007194280521610818, 0.02133204118469308, 0.06189473569795954, 0.13173197052597485, 0.27391128183098, 0.3794141055089561]
 y_total_simple=[0.7877194280521611, 0.7783320411846931, 0.7548947356979595, 0.7117319705259748, 0.55691128183098, 0.4304141055089561]
-x = [0,10,20,30, 45.1, 55, 60, 65, 70, 75, 80, 85]
-y_diffuse_LXe_lowp_corr_nrange_0_15 = [0.6849844088090226, 0.6849516137424515, 0.6848980276446702, 0.6847429162132819, 0.6833829882810474, 0.6775133737054704, 0.6648755402871067, 0.46715038281764626, 0.2314865916574596, 0.10280210546075348, 0.055122569722441166, 0.034902985796637635]
-y_specular_LXe_lowp_corr_nrange_0_15 = [0.00146013432719507, 0.001478443859610552, 0.0015779403159794014, 0.0019483216615979846, 0.007657043665555211, 0.03925621759438618, 0.10069087274728164, 0.25351695587136364, 0.4636921738221411, 0.6502541779199938, 0.7858725030849131, 1.0104218377702237]
-y_total_LXe_lowp_corr_nrange_0_15 = [sum(x) for x in zip(y_specular_LXe_lowp_corr_nrange_0_15,y_diffuse_LXe_lowp_corr_nrange_0_15)]
-y_diffuse=y_diffuse_indiv
-y_specular=y_specular_indiv
-y_total=y_total_indiv
-# plt.figure()
-# plt.plot(angles, y_diffuse, label="diffuse",linestyle='-',color='c')
-# plt.plot(angles, y_specular, label="specular",linestyle='-',color='y')
-# plt.plot(angles, y_total, label="total",linestyle='-',color='b')
-# plt.plot(angles, y_diffuse_indiv, label="diffuse indiv",linestyle='-.',color='c')
-# plt.plot(angles, y_diffuse_simple, label="diffuse simple",linestyle='--',color='c')
-# plt.plot(x,y_diffuse_LXe_lowp_corr_nrange_0_15, label="diffuse global",linestyle='-',color='c')
-# plt.plot(angles, y_specular_indiv, label="specular indiv",linestyle='-.',color='y')
-# plt.plot(angles, y_specular_simple, label="specular simple",linestyle='--',color='y')
-# plt.plot(x,y_specular_LXe_lowp_corr_nrange_0_15, label="specular global",linestyle='-',color='y')
-# plt.plot(angles, y_total_indiv, label="total indiv",linestyle='-.',color='b')
-# plt.plot(angles, y_total_simple, label="total simple",linestyle='--',color='b')
-# plt.plot(x,y_total_LXe_lowp_corr_nrange_0_15, label="total global",linestyle='-',color='b')
-# plt.xlabel("incident angle (degrees)")
-# plt.ylabel("reflectance (fraction)")
-# plt.xlim(0,85)
-# plt.ylim(0,1)
-# plt.legend()
-# plt.title("Fitted "+sample_name+" Reflectance, 178 nm")
+# y_diffuse=y_diffuse_simple
+# y_specular=y_specular_simple
+# y_total=y_total_simple
+plt.figure()
+plt.plot(angles, y_diffuse, label="diffuse",linestyle='-',color='c')
+plt.plot(angles, y_specular, label="specular",linestyle='-',color='y')
+plt.plot(angles, y_total, label="total",linestyle='-',color='b')
+plt.xlabel("incident angle (degrees)")
+plt.ylabel("reflectance (fraction)")
+plt.xlim(0,85)
+plt.ylim(0,1)
+plt.legend()
 
+plt.title("Fitted "+sample_name+" Reflectance, 178 nm")
 plt.show()
 

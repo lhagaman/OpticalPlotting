@@ -486,7 +486,7 @@ def BRIDF_pair(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision
     # add specular spike, if parameters length >3
     specular_delta=0
     C = 0
-    if len(parameters)>3 and not sigmoid_F:    
+    if len(parameters)>3 and not sigmoid_F and not simple_fit:    
         K = parameters[3]
         if K > 0:
             # this is where it differs from semi-empirical fit, Lambda was slightly different 
@@ -873,7 +873,7 @@ def reflectance(theta_i_in_degrees, n_0, polarization, parameters):
         return BRIDF(theta_r, phi_r, theta_i, n_0, polarization, parameters, precision=-1) * np.sin(theta_r) / G 
 
     spec_spike = 0
-    if len(parameters)>3:
+    if len(parameters)>3 and not simple_fit and not sigmoid_F:
         n=parameters[1]
         K=parameters[3]
         C = specular_spike_norm(theta_i, theta_i, K)
@@ -958,7 +958,7 @@ def reflectance_specular(theta_i_in_degrees, n_0, polarization, parameters):
         return BRIDF_specular(theta_r-1e-8, phi_r, theta_i, n_0, polarization, parameters, precision=-1) * np.sin(theta_r) / G 
 
     spec_spike = 0
-    if len(parameters)>3 and not simple_fit:
+    if len(parameters)>3 and not simple_fit and not sigmoid_F:
         n=parameters[1]
         K=parameters[3]
         C = specular_spike_norm(theta_i, theta_i, K)

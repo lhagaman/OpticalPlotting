@@ -343,6 +343,7 @@ for ii in range(len(runs)):
 		shift_max = 1.09
 		spec_max = 2.6
 	# Parameters are albedo, specular normalization, gamma, angle shift (last is overall scaling, nu; not needed)
+	print(spec_max)
 	fit_params = fit_parameters(run_data,p0=[0.1, np.minimum(1.7,spec_max), .1, 0.9, 1.0],average_angle=-1, precision=-1, sigma_theta_i=-1, use_errs=True, use_spike=True, use_nu=False,bounds=([0.01,1.69+1e-4,0.03,0.84,0.3],[1.6,spec_max,0.6,shift_max,1.7])) # theta_r shift range is +5 to -10 deg
 	#fit_params=fit_params_simple[ii]
 	# fit_params=[.051,2.47,.076,1]
@@ -362,11 +363,11 @@ for ii in range(len(runs)):
 	plt.text(0.02,0.92-.04*ii,str(angles[ii]) + r"$^\circ$: $\rho_L$={0:.3f}, $N_{{sp}}$={1:.3f}, $\gamma$={2:.3f}, $\Delta\theta$={3:.1f}, $\chi^2$={4:.2f}".format(fit_params[0],np.log(fit_params[1]/n_LXe_178),fit_params[2],np.log(fit_params[3])*180/np.pi,chi_sq),transform=plt.gca().transAxes,fontsize=11)
 
 	# Total reflectance calcs
-	y_diff=reflectance_diffuse(angles[ii], n_LXe_178, 0.5, fit_params)
-	y_diffuse.append(y_diff)
-	y_spec=reflectance_specular(angles[ii], n_LXe_178, 0.5, fit_params)
-	y_specular.append(y_spec)
-	y_total.append(y_diff+y_spec)
+	# y_diff=reflectance_diffuse(angles[ii], n_LXe_178, 0.5, fit_params)
+	# y_diffuse.append(y_diff)
+	# y_spec=reflectance_specular(angles[ii], n_LXe_178, 0.5, fit_params)
+	# y_specular.append(y_spec)
+	# y_total.append(y_diff+y_spec)
 
 print("Diffuse reflectances: ",y_diffuse)
 print("Specular reflectances: ",y_specular)
@@ -378,16 +379,16 @@ y_total_simple=[0.7877194280521611, 0.7783320411846931, 0.7548947356979595, 0.71
 # y_diffuse=y_diffuse_simple
 # y_specular=y_specular_simple
 # y_total=y_total_simple
-plt.figure()
-plt.plot(angles, y_diffuse, label="diffuse",linestyle='-',color='c')
-plt.plot(angles, y_specular, label="specular",linestyle='-',color='y')
-plt.plot(angles, y_total, label="total",linestyle='-',color='b')
-plt.xlabel("incident angle (degrees)")
-plt.ylabel("reflectance (fraction)")
-plt.xlim(0,85)
-plt.ylim(0,1)
-plt.legend()
+# plt.figure()
+# plt.plot(angles, y_diffuse, label="diffuse",linestyle='-',color='c')
+# plt.plot(angles, y_specular, label="specular",linestyle='-',color='y')
+# plt.plot(angles, y_total, label="total",linestyle='-',color='b')
+# plt.xlabel("incident angle (degrees)")
+# plt.ylabel("reflectance (fraction)")
+# plt.xlim(0,85)
+# plt.ylim(0,1)
+# plt.legend()
 
-plt.title("Fitted "+sample_name+" Reflectance, 178 nm")
+# plt.title("Fitted "+sample_name+" Reflectance, 178 nm")
 plt.show()
 

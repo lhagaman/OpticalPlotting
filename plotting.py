@@ -78,7 +78,7 @@ def plot_runs(runs, title=False, rot=False, voltage=False, labels=False, label=F
 		if rot:
 			plt.xlabel("rotation stage angle \n(0 is looking directly into beam, 180 is blocking beam)")
 		else:
-			plt.xlabel("angle relative to sample normal (degrees)")
+			plt.xlabel(r"Viewing angle $\theta_r$ (degrees)")#("angle relative to sample normal (degrees)")
 
 	if ylabel:
 		plt.ylabel(ylabel)
@@ -86,14 +86,14 @@ def plot_runs(runs, title=False, rot=False, voltage=False, labels=False, label=F
 		if voltage:
 			plt.ylabel("rate (Hz)")
 		else:
-			plt.ylabel("intensity (reflected rate/str)/(incident rate)")
+			plt.ylabel(r"Average BRIDF $(d\Phi_r/d\Omega_r)/\Phi_i$ (sr$^{-1}$)")
 	if log:
 		plt.ylim(0.5 * np.max([miny, 0.001]), 5. * maxy)
 		plt.yscale("log")
 	else:
 		plt.ylim(0, 1.1 * maxy)
 	plt.xlim(minx, maxx)
-	#plt.ylim(1e-3,1e2)
+	plt.ylim(1e-3,1e2)
 	if title:
 		plt.title(title)
 	if include_legend:

@@ -61,6 +61,8 @@ mirror_data_lxe = [
 [60., mirror_path_lxe + "2018_10_29__09_25_03.txt"],
 [67., mirror_path_lxe + "2018_10_29__09_25_03.txt"], # data not taken at this angle, must assume same as 60
 [75., mirror_path_lxe + "2018_10_29__09_45_18.txt"]]
+# Gives ~69% at 75 deg incidence (100% at others)
+#mirror_data_lxe=[]
 
 s9_path = path_run1 + "Sample 9\\"
 s9_r1_30 = Run(s9_path + "2018_11_02__20_38_01.txt", mirror_data_lxe)
@@ -295,19 +297,24 @@ s2_r3_hip_67 = Run(path_run3 + "Sample 2, 1.4 barg\\2018_12_19__19_02_21.txt")
 s2_r3_hip_75 = Run(path_run3 + "Sample 2, 1.4 barg\\2018_12_19__19_12_01.txt")
 angle_shifts_s2_r3_hip=[30, 45, 52, 60, 69, 74]
 
-runs = [s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75]#[s8_30, s8_45, s8_52, s8_60, s8_67, s8_75]#[s9_r3_hip_30,s9_r3_hip_45,s9_r3_hip_52,s9_r3_hip_60,s9_r3_hip_67,s9_r3_hip_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75]#[s6_r3_hip_30,s6_r3_hip_45,s6_r3_hip_52,s6_r3_hip_60,s6_r3_hip_67,s6_r3_hip_75]#[s9_400nm_30,s9_400nm_45,s9_400nm_52,s9_400nm_60,s9_400nm_67,s9_400nm_75]#[s5_30,s5_45,s5_52,s5_60,s5_67,s5_75]#[s8_30,s8_45,s8_52,s8_60,s8_67,s8_75]#[s9_220nm_30,s9_220nm_45,s9_220nm_52,s9_220nm_60,s9_220nm_67,s9_220nm_75]#[s2_r3_hip_30,s2_r3_hip_45,s2_r3_hip_52,s2_r3_hip_60,s2_r3_hip_67,s2_r3_hip_75]#[s9_lowp_above_30,s9_lowp_above_45,s9_lowp_above_52,s9_lowp_above_60,s9_lowp_above_67,s9_lowp_above_75]#[s9_bubbles_30,s9_bubbles_45,s9_bubbles_52,s9_bubbles_60,s9_bubbles_67,s9_bubbles_75]#[s9_lowp_30,s9_lowp2_30,s9_medp_30,s9_medp2_30,s9_hip_30,s9_hip2_30]#[s9_medp2_30,s9_medp2_45,s9_medp2_52,s9_medp2_60,s9_medp2_67,s9_medp2_75,s9_hip2_30,s9_hip2_45,s9_hip2_52,s9_hip2_60,s9_hip2_67,s9_hip2_75]#[s9_lowp2_30,s9_lowp2_45,s9_lowp2_52,s9_lowp2_60,s9_lowp2_67,s9_lowp2_75,s9_medp2_30,s9_medp2_45,s9_medp2_52,s9_medp2_60,s9_medp2_67,s9_medp2_75,s9_hip2_30,s9_hip2_45,s9_hip2_52,s9_hip2_60,s9_hip2_67,s9_hip2_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75,s9_lowp_above_30,s9_lowp_above_45,s9_lowp_above_52,s9_lowp_above_60,s9_lowp_above_67,s9_lowp_above_75]#[s9_lowp_75,s9_medp_75,s9_hip_75]#[s9_medp_30,s9_medp_45,s9_medp_52,s9_medp_60,s9_medp_67,s9_medp_75,s9_hip_30,s9_hip_45,s9_hip_52,s9_hip_60,s9_hip_67,s9_hip_75]#[s9_lowp_30,s9_lowp_45,s9_lowp_52,s9_lowp_60,s9_lowp_67,s9_lowp_75,s9_medp_30,s9_medp_45,s9_medp_52,s9_medp_60,s9_medp_67,s9_medp_75,s9_hip_30,s9_hip_45,s9_hip_52,s9_hip_60,s9_hip_67,s9_hip_75]#[s9_nobubbles_30,s9_nobubbles_45,s9_nobubbles_52,s9_nobubbles_60,s9_nobubbles_67,s9_nobubbles_75,s9_getter_30,s9_getter_45,s9_getter_52,s9_getter_60,s9_getter_67,s9_getter_75]#[s9_first_30,s9_first_45,s9_first_52,s9_first_60,s9_first_67,s9_first_75,s9_nobubbles_30,s9_nobubbles_45,s9_nobubbles_52,s9_nobubbles_60,s9_nobubbles_67,s9_nobubbles_75]#
-angle_shifts=angle_shifts_s8
+angle_shifts_none = [30, 45, 52, 60, 67, 75]
+
+runs = [s8_30,s8_45,s8_52,s8_60,s8_67,s8_75]
+angle_shifts=angle_shifts_s8#
 for run, angle in zip(runs, angle_shifts): run.change_theta_i(angle)
 labels=[r"$\theta_i=30^{\circ}$","45$^{\circ}$","52$^{\circ}$","60$^{\circ}$", "67$^{\circ}$", "75$^{\circ}$"]#,"30 degrees","45 degrees","52 degrees","60 degrees", "67 degrees", "75 degrees"]
 
 # Plot BRIDF data
-sample_name="807NX turn"
-plot_runs(runs, title=sample_name+", Run 1 in 0.82 barg LXe, 178 nm", log=True, labels=labels, include_legend=True, errorbars=True, legend_loc=0)
+sample_name="M17 Skived"
+plot_runs(runs, title=sample_name+" in 0.2 barg LXe, 178 nm", log=True, labels=labels, include_legend=True, errorbars=True, legend_loc=0)
 # plot_runs(runs, title=sample_name+" in 0.2 barg LXe, 178 nm, 75 deg", log=False, labels=False, include_legend=False, errorbars=True, legend_loc=0)
 t0=time.time()
 
 # Fit data
-# fit_params = fit_parameters(get_independent_variables_and_relative_intensities(runs),p0=[.93, 1.57, .08, 0.8, 4.0],average_angle=4, precision=.25, sigma_theta_i=2, use_errs=True,use_spike=True, use_nu=True,bounds=([0.1,1.1,0.03,0.01,1.0],[1.6,2.6,0.6,10.,50.]))
+average_angle=4
+precision=0.25
+sigma_theta_i=2
+fit_params = fit_parameters(get_independent_variables_and_relative_intensities(runs),p0=[.8, 1.57, .15, 0.8, 4.0],average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i, use_errs=True,use_spike=True, use_nu=True,bounds=([0.1,1.1,0.03,0.01,1.0],[1.6,2.6,0.6,10.,50.]))
 # fit_params = fit_parameters(get_independent_variables_and_relative_intensities(runs),p0=[1.1,1.55,.2,5.],average_angle=4, precision=.25, sigma_theta_i=2, use_errs=True,use_spike=False,bounds=([0.7,1.4,0.04,3.],[1.7,1.8,0.3,50.]))#[0.5,1.4,0.04,5.0],[1.2,1.8,0.3,50.]#[0.5,1.4,0.1],[1.0,1.8,0.3]#[0.01,1.01,0.05],[2.0,3.0,0.5]
 #fit_params_ang = fit_parameters_and_angle(get_independent_variables_and_relative_intensities(runs),average_angle=4.)
 #fit_ang = fit_params_ang[0]
@@ -351,8 +358,13 @@ fit_params_r3_s9_lowp= [1.0216459850600514, 1.5467069707623793, 0.11016141049571
 fit_params_r3_s2_hip=[1.0720924015263558, 1.5425690292388028, 0.20472829546890117] # error on n from fit is 1.542-1.543; correlation is 2% w/ rho, -48% w/ gamma (gamma and rho are -0.8%, i.e. very uncorrelated); not much difference in profile for 20 pts in rho, gamma vs 10
 # Fit parameters using power correction, TR dist, 2.00 solid angle factor, Gaussian distribution in n
 fit_params_s9_lowp_gauss_n= [0.7617591236933063, 1.581667834504223, 0.10965539347694214, 1.2535811658618297]
+fit_params_s9_lowp_gauss_n_avg_th_i= [0.7609462015431285, 1.582609474840131, 0.10780026364421137, 1.2054912290860835]
+fit_params_s9_lowp_gauss_n_K= [0.761599611155242, 1.5815793188535345, 0.11191879921883578, 1.2201210442226107, 14.277129983905931]
+fit_params_s9_lowp_gauss_n_no_shifts= [0.769242966604082, 1.5852289495281273, 0.10771591861029142, 1.2158263580060567]
 fit_params_s9_lowp2_gauss_n= [0.855702300814262, 1.5823928228219537, 0.1174943642524602, 1.375597480899577]
 fit_params_s9_hip_gauss_n= [0.7951797306837846, 1.6003118297015986, 0.1096203149254032, 1.219900829304097]
+fit_params_s9_hip_gauss_n_K= [0.7945384271845404, 1.602646152260622, 0.1115559065384748, 1.220050548633835, 13.227066710978328]
+fit_params_s9_hip_gauss_n_no_shifts= [0.7940818388896351, 1.600935461194724, 0.10848911387904168, 1.205324228102278]
 fit_params_s9_hip2_gauss_n= [0.8226683156062747, 1.5974576635618738, 0.11905775599090765, 1.3981072921827302]
 fit_params_s9_medp_gauss_n= [0.8090807492966514, 1.601324395321314, 0.11048727271620085, 1.4948435916434195]
 fit_params_s9_medp2_gauss_n= [0.8314357200774386, 1.596290134519927, 0.1133753088729935, 1.390219480578202]
@@ -364,18 +376,35 @@ fit_params_s9_165nm_gauss_n= [0.217183610197179, 1.9181849064913858, 0.153679609
 fit_params_s9_300nm_gauss_n=  [0.9447069486729521, 1.4374429468203447, 0.1070442097507485, 1.5680079162288003]
 fit_params_s9_400nm_gauss_n= [0.6021432485069854, 1.5440956423913457, 0.13516753727577357, 2.6357777432157024]
 fit_params_s5_lowp_gauss_n= [0.7676075426046298, 1.5751319649534214, 0.11329673174987098, 1.5458560015702658]
+fit_params_s5_lowp_gauss_n_K= [0.7688329396602982, 1.5756618376356233, 0.11614806509236066, 1.5381075182965038, 13.226431652192183]
+fit_params_s5_lowp_gauss_n_no_shifts= [0.7782880586798291, 1.577072408802508, 0.11436341759846344, 1.5220682496134548]
 fit_params_s8_lowp_gauss_n= [0.9144536241966592, 1.5793399801859325, 0.08088290783956979, 1.2565135586082907, 4.857675748475832] # Uses both sigma_n and specular spike
+fit_params_s8_lowp_gauss_n_no_shifts= [0.9225699145693543, 1.588031863131094, 0.0842522518451473, 1.3605935175884438, 5.079183205641229]
 fit_params_s1_r1_gauss_n= [0.6280995506491662, 1.57787534395258, 0.14910541148290482, 1.5083045922962428]
+fit_params_s1_r1_gauss_n_no_shifts= [0.6372890302810634, 1.5744315829916964, 0.1560872104598135, 1.395561603183545]
+fit_params_s1_r1_gauss_n_no_mirror_corr= [0.6105695353393907, 1.5955250480417826, 0.1492097927571062, 1.8801134275909606]
 fit_params_s9_r1_gauss_n= [0.8279, 1.5623, 0.1202, 1.09]
+fit_params_s9_r1_gauss_n_no_shifts= [0.8180422985892427, 1.5749038699912994, 0.11658570494644083, 1.2610641675924548]
+fit_params_s9_r1_gauss_n_no_mirror_corr= [0.8208838837924937, 1.5760342735839312, 0.11768303279886047, 1.4241284008541077]
 fit_params_s3_r1_gauss_n= [0.765861613638844, 1.572270174034155, 0.16606130754530377, 1.444391660582311]
+fit_params_s3_r1_gauss_n_no_shifts= [0.7710054022542696, 1.5650221301238583, 0.174944695159959, 1.3500202212329961]
+fit_params_s3_r1_gauss_n_no_mirror_corr= [0.7497880135678483, 1.5681265637165533, 0.17838156093212051, 1.4458231208188441]
 fit_params_s2_lowp_r3_gauss_n= [0.717, 1.545, 0.209, 1.62]
+fit_params_s2_lowp_r3_gauss_n_K= [0.7208370334215908, 1.5435964416674288, 0.21400379966761915, 1.551395838542668, 17.571866360302728]
+fit_params_s2_lowp_r3_gauss_n_no_shifts= [0.7096471430360517, 1.5417266508966976, 0.20645384089925944, 1.3961019482288577]
 fit_params_s2_hip_r3_gauss_n= [0.793, 1.577, 0.196, 1.70]
+fit_params_s2_hip_r3_gauss_n_no_shifts= [0.790394172118805, 1.5723144067740522, 0.19779669978845726, 1.4647042306844282]
 fit_params_s2_lowp_above_r3_gauss_n= [0.771, 1.545, 0.203, 1.54]
+fit_params_s2_lowp_above_r3_gauss_n_no_shifts= [0.790394172118805, 1.5723144067740522, 0.19779669978845726, 1.4647042306844282]
 fit_params_s6_lowp_r3_gauss_n= [0.744, 1.572, 0.184, 1.89]
+fit_params_s6_lowp_r3_gauss_n_no_shifts= [0.7213579158243433, 1.5575036277573115, 0.19212420351335957, 1.5704031665142164]
 fit_params_s6_hip_r3_gauss_n= [0.733, 1.596, 0.192, 2.02]
-fit_params=fit_params_s6_hip_r3_gauss_n
+fit_params_s6_hip_r3_gauss_n_no_shifts= [0.7285049548850765, 1.5818586652930904, 0.19952845238602915, 1.7528683365199869]
+# fit_params=fit_params_s6_hip_r3_gauss_n
 fit_params_s9_lowp_r3_gauss_n= [0.742, 1.568, 0.12, 1.34]
+fit_params_s9_lowp_r3_gauss_n_no_shifts= [0.7154114289769111, 1.5781158892363052, 0.1269589231665292, 1.4820640422951696]
 fit_params_s9_hip_r3_gauss_n= [0.748, 1.596, 0.12, 1.71]
+fit_params_s9_hip_r3_gauss_n_no_shifts= [0.7005869703356364, 1.6213467457839776, 0.11230221691508363, 1.9330445416367479]
 # fit_params=[0.94, 1.5665, 0.0627, 0.8, 4.03]
 # fit_params = fit_params_s9_lowp2_gauss_n
 # Keeping rho fixed doesn't affect profile much; fixing gamma narrows it (but still chi^2/n only changes by ~.02 over nominal error range of +/- 0.001 or so; fit seems to think it's even more constrained than raw chi^2/n says) - this was w/o averaging
@@ -409,9 +438,7 @@ n_LXe_220 = 1.5044552
 n_LXe_300 = 1.42975267
 n_LXe_400 = 1.404459446
 n_LXe = n_LXe_178
-sigma_theta_i=2
-precision=.25
-average_angle=4
+
 # plot_TSTR_fit(20., n_LXe_178, fit_params, color="r", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
 # plot_TSTR_fit(30., n_LXe_178, fit_params, color="b", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
 # plot_TSTR_fit(45., n_LXe_178, fit_params, color="r", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
@@ -420,12 +447,12 @@ average_angle=4
 # plot_TSTR_fit(75, n_LXe_178, fit_params, color="g", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
 # plt.ylim(1e-3,1e2)
 # plt.yscale("log")
-# plot_TSTR_fit(angle_shifts[0], n_LXe, fit_params, color="r", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-# plot_TSTR_fit(angle_shifts[1], n_LXe, fit_params, color="g", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-# plot_TSTR_fit(angle_shifts[2], n_LXe, fit_params, color="b", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-# plot_TSTR_fit(angle_shifts[3], n_LXe, fit_params, color="m", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-# plot_TSTR_fit(angle_shifts[4], n_LXe, fit_params, color="c", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
-# plot_TSTR_fit(angle_shifts[5], n_LXe, fit_params, color="y", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(angle_shifts[0], n_LXe, fit_params, color="r", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(angle_shifts[1], n_LXe, fit_params, color="g", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(angle_shifts[2], n_LXe, fit_params, color="b", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(angle_shifts[3], n_LXe, fit_params, color="m", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(angle_shifts[4], n_LXe, fit_params, color="c", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+plot_TSTR_fit(angle_shifts[5], n_LXe, fit_params, color="y", average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
 # colors=["r","g","b","m","c","y"]
 # phi_r_list=[0,1,2,5,9,15]
 # for ii in range(len(phi_r_list)):
@@ -458,18 +485,18 @@ print("Plotting time: {0}".format(t2-t1))
 # grid_results = fit_parameters_grid(get_independent_variables_and_relative_intensities(runs),rho_start=1.072, rho_end=1.072, rho_num=1, n_start=1.542, n_end=1.5432, n_num=15, gamma_start=0.202, gamma_end=0.208, gamma_num=15, plot=True, show=True, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i, do_profiles=[False, True, True])
 
 # Now calculate hemispherical reflectance
-plt.figure()
+# plt.figure()
 
-# Different incident angles to calculate for
-x = [0,10,20,30, 45.1, 55, 60, 65, 70, 75, 80, 85]#[0,30,45.1,60,70,75,80,85]#[5,60,70,80]#[5,30, 45, 60, 70, 75, 80, 85]#[0,10,20,30, 45, 55, 60, 65, 70, 75, 80, 85]#
+# # Different incident angles to calculate for
+# x = [0,10,20,30, 45.1, 55, 60, 65, 70, 75, 80, 85]#[0,30,45.1,60,70,75,80,85]#[5,60,70,80]#[5,30, 45, 60, 70, 75, 80, 85]#[0,10,20,30, 45, 55, 60, 65, 70, 75, 80, 85]#
 
-y_diffuse = [reflectance_diffuse(theta, n_LXe, 0.5, fit_params) for theta in x]
-y_specular = [reflectance_specular(theta, n_LXe, 0.5, fit_params) for theta in x]
-y_total = [y_diffuse[i] + y_specular[i] for i in range(len(y_specular))]
+# y_diffuse = [reflectance_diffuse(theta, n_LXe, 0.5, fit_params) for theta in x]
+# y_specular = [reflectance_specular(theta, n_LXe, 0.5, fit_params) for theta in x]
+# y_total = [y_diffuse[i] + y_specular[i] for i in range(len(y_specular))]
 
-print("Diffuse reflectances: ",y_diffuse)
-print("Specular reflectances: ",y_specular)
-print("Total reflectances: ",y_total)
+# print("Diffuse reflectances: ",y_diffuse)
+# print("Specular reflectances: ",y_specular)
+# print("Total reflectances: ",y_total)
 
 # x_full=x[:]
 # x_full.append(90)
@@ -655,9 +682,9 @@ print("Total reflectances: ",y_total)
 # y_specular_LXe_s9_400nm_gauss_n = [0.004165797736000184, 0.004182517617872596, 0.004291566382412554, 0.004667317220860221, 0.007058934876843024, 0.013029641816818979, 0.02032056588648655, 0.03476831533741435, 0.06259677066645455, 0.10749236843594039, 0.17575867773952733, 0.30697067886350216]
 
 # Make linear interpolation functions for diffuse, specular reflectivity vs theta_i
-th_list=np.array(x)*np.pi/180 # x is in degrees; want in radians
-f_diff = interp1d(th_list, y_diffuse)
-f_spec = interp1d(th_list, y_specular)
+# th_list=np.array(x)*np.pi/180 # x is in degrees; want in radians
+# f_diff = interp1d(th_list, y_diffuse)
+# f_spec = interp1d(th_list, y_specular)
 
 # Make a version that will extrapolate beyond the measured range (0-85 deg)
 def f_ext(x_list, interp_func):
@@ -680,17 +707,17 @@ def integral_unif_func(x_, interp_func):
 def integral_white_sky_func(x_, interp_func):
 	return 2*np.cos(x_)*np.sin(x_)*f_ext(x_, interp_func)
 	
-uniform_diff = quad(integral_unif_func, 0, np.pi/2, f_diff)[0]
-uniform_spec = quad(integral_unif_func, 0, np.pi/2, f_spec)[0]
-print("Uniform diffuse reflectance: {0:.3f}, specular: {1:.3f}, total: {2:.3f}".format(uniform_diff, uniform_spec, uniform_diff+uniform_spec))
+# uniform_diff = quad(integral_unif_func, 0, np.pi/2, f_diff)[0]
+# uniform_spec = quad(integral_unif_func, 0, np.pi/2, f_spec)[0]
+# print("Uniform diffuse reflectance: {0:.3f}, specular: {1:.3f}, total: {2:.3f}".format(uniform_diff, uniform_spec, uniform_diff+uniform_spec))
 	
-white_sky_diff = quad(integral_white_sky_func, 0, np.pi/2, f_diff)[0]
-white_sky_spec = quad(integral_white_sky_func, 0, np.pi/2, f_spec)[0]
-print("White sky diffuse reflectance: {0:.3f}, specular: {1:.3f}, total: {2:.3f}".format(white_sky_diff, white_sky_spec, white_sky_diff+white_sky_spec)) 
+# white_sky_diff = quad(integral_white_sky_func, 0, np.pi/2, f_diff)[0]
+# white_sky_spec = quad(integral_white_sky_func, 0, np.pi/2, f_spec)[0]
+# print("White sky diffuse reflectance: {0:.3f}, specular: {1:.3f}, total: {2:.3f}".format(white_sky_diff, white_sky_spec, white_sky_diff+white_sky_spec)) 
 
-plt.plot(x, y_diffuse, label="diffuse")
-plt.plot(x, y_specular, label="specular")
-plt.plot(x, y_total, label="total")
+# plt.plot(x, y_diffuse, label="diffuse")
+# plt.plot(x, y_specular, label="specular")
+# plt.plot(x, y_total, label="total")
 # plt.plot(x, y_specular_vacuum_after, label="specular, vacuum",linestyle='-',color='y')
 # plt.plot(x, y_specular_LXe_lowp, label="specular, 0.2 barg LXe",linestyle='-.',color='y')
 # # #plt.plot(x, y_specular_LXe_lowp2, label="spec_lowp2")
@@ -708,12 +735,12 @@ plt.plot(x, y_total, label="total")
 # # #plt.plot(x, y_total_LXe_hip2, label="total_hip2")
 # # # # Line styles: '-', '--', '-.', ':'
 
-plt.xlabel("incident angle (degrees)")
-plt.ylabel("reflectance (fraction)")
-plt.legend()
-plt.ylim(0,1.1)
+# plt.xlabel("incident angle (degrees)")
+# plt.ylabel("reflectance (fraction)")
+# plt.legend()
+# plt.ylim(0,1.1)
 
-plt.title("Fitted "+sample_name+" Reflectance, 178 nm")
+# plt.title("Fitted "+sample_name+" Reflectance, 178 nm")
 t3=time.time()
 print("Reflectance calc time: {0}".format(t3-t2))
 plt.show()

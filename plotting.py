@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from gaussian_fit import gaussian_get_params
 from TSTR_fit_new import BRIDF_plotter
+import seaborn as sns
 
 # takes a single run, list of runs, or list of lists of runs. For a list of lists, it gives each inner list the same color and label.
 def plot_runs(runs, title=False, rot=False, voltage=False, labels=False, label=False, show=False, xlabel="", ylabel="", figure=True, smooth=False, legend_loc=0, include_legend=True, linestyle="-", log=False, errorbars=True, color="", colormap=False):
@@ -19,8 +20,10 @@ def plot_runs(runs, title=False, rot=False, voltage=False, labels=False, label=F
 	if color:		
 		color_list = [color]*len(runs)
 	else:
-		if len(runs) > 12 or colormap:	# If using a long list, color in order according to 'cool' colormap
-			color_list = [plt.cm.cool(i) for i in np.linspace(0,1,len(runs))] 
+		if len(runs) > 12 or colormap:	# If using a long list, color in order according to colormap below
+			#cmap=sns.cubehelix_palette(as_cmap=True,n_colors=6,gamma=0.7,hue=1.0,light=0.7,dark=0.15)
+			color_list = [plt.cm.plasma(i) for i in np.linspace(0.2,0.90,len(runs))] 
+			#color_list = [cmap(i) for i in np.linspace(0,1,len(runs))] 
 		else:
 			color_list = ["r", "g", "b", "m", "c", "y", "k", "lightpink", "darksalmon", "slategray", "plum", "lightcoral", "indigo", "darkorange"]
 
@@ -130,7 +133,8 @@ def plot_TSTR_fit(theta_i, n, fit_params, label="", color="", average_angle=0, p
 			if fit_params[4] > 0:
 				fit_text += r", $\nu$={0:.3f}".format(fit_params[4])
 		plt.text(0.05,0.05 + fit_text_offset, fit_text,transform=plt.gca().transAxes,fontsize=13)
-	plt.legend()
+	if label:
+		plt.legend()
 
 """fit_params=["rho_L_1","n_1","gamma_1","K_1",
              ,"gamma_2","frac_1"]

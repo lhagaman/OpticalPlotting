@@ -85,11 +85,11 @@ angle_shifts_none = [30, 45, 52, 60, 67, 75]
 # bkg_scaling=0.5 (0.8 for 165 nm)
 # bkg = (self.beam_bkg_intensities-self.dark_bkg_intensities)*(self.incidentpower/self.beam_bkg_incidentpower)*bkg_scaling +self.dark_bkg_intensities
 # Used sigma_theta_i=-1 for fitting and wavelength_F = True in TSTR_fit_new.py
-# Angle range in file_reader stops at 80, same for plot_TSTR_fit
+# Angle range in file_reader stops at 80, same for plot_TSTR_fit in plotting.py
 # Make sure n=n_LXe for plotting below
 # Also explicitly set n=n_LXe for the given wavelength in TSTR_fit_new.py, both in F_wavelength_range() and in BRIDF_pair()
-runs = [s9_400nm_30,s9_400nm_45,s9_400nm_52,s9_400nm_60,s9_400nm_67,s9_400nm_75]
-angle_shifts=angle_shifts_s9_400nm
+runs = [s9_165nm_30,s9_165nm_45,s9_165nm_52,s9_165nm_60,s9_165nm_67,s9_165nm_75]
+angle_shifts=angle_shifts_s9_165nm
 
 
 for run, angle in zip(runs, angle_shifts): run.change_theta_i(angle)
@@ -112,7 +112,7 @@ fit_params_s9_220nm_gauss_n= [0.743200885061454, 1.4435971310198534, 0.083262632
 fit_params_s9_300nm_gauss_n= [0.9447069486729521, 1.4374429468203447, 0.1070442097507485, 1.5680079162288003]
 fit_params_s9_400nm_gauss_n= [0.6021432485069854, 1.5440956423913457, 0.13516753727577357, 2.6357777432157024]
 
-fit_params = fit_params_s9_400nm_gauss_n
+fit_params = fit_params_s9_165nm_gauss_n
 
 
 print("Fit parameters (rho_L, n, gamma): "+str(fit_params))
@@ -127,7 +127,7 @@ n_LXe_178 = 1.69
 n_LXe_220 = 1.5044552
 n_LXe_300 = 1.42975267
 n_LXe_400 = 1.404459446
-n_LXe = n_LXe_400
+n_LXe = n_LXe_165
 n=n_LXe
 
 plt.xlim(0,86)
@@ -137,22 +137,23 @@ plt.yscale("log")
 #colors=["r","g","b","m","c","y"]
 colors=[plt.cm.plasma(i) for i in np.linspace(0.2,0.90,len(runs))] 
 # colors=[cmap(i) for i in np.linspace(0,1,len(runs))] 
-# label_x=[0.52,0.94,0.88,0.87,0.9,0.88] # Positions for 165 nm
-# label_y=[0.21,0.29,0.45,0.56,0.65,0.76]
+label_x=[0.52,0.94,0.88,0.87,0.9,0.88] # Positions for 165 nm
+label_y=[0.21,0.29,0.45,0.56,0.65,0.76]
 # label_x=[0.61,0.94,0.94,0.88,0.85,0.86] # Positions for 220 nm
 # label_y=[0.27,0.15,0.23,0.45,0.63,0.90]
 # label_x=[0.61,0.94,0.94,0.88,0.85,0.86] # Positions for 300 nm
 # label_y=[0.32,0.15,0.23,0.48,0.60,0.83]
-label_x=[0.60,0.94,0.94,0.94,0.85,0.86] # Positions for 400 nm; uses angle range of 0-86
-label_y=[0.28,0.21,0.29,0.36,0.55,0.70]
+# label_x=[0.60,0.94,0.94,0.94,0.85,0.86] # Positions for 400 nm; uses angle range of 0-86
+# label_y=[0.28,0.21,0.29,0.36,0.55,0.70]
 # label_x=[0.63,0.93,0.88,0.85,0.9,0.88] # Positions for s9 low_p (178 nm)
 # label_y=[0.27,0.31,0.45,0.63,0.75,0.88]
 
 angle_labels=[r"$\theta_i=30^{\circ}$",r"$45^{\circ}$",r"$52^{\circ}$",r"$60^{\circ}$",r"$67^{\circ}$",r"$75^{\circ}$"]
 for ii in range(len(angle_shifts)):
-	# plot_TSTR_fit(angle_shifts[ii], n, fit_params, color=colors[ii], label=None, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+	plot_TSTR_fit(angle_shifts[ii], n, fit_params, color=colors[ii], label=None, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i, include_fit_text=False)
 	plt.text(label_x[ii], label_y[ii], angle_labels[ii],transform=plt.gca().transAxes,fontsize=13,color=colors[ii])
-	
+
+plt.text(0.103, 0.71, r"$\lambda$=165 nm",transform=plt.gca().transAxes,fontsize=13)	
 
 # Set x-axis tick marks to every 10 deg
 loc = matplotlib.ticker.MultipleLocator(base=10.0) # this locator puts ticks at regular intervals

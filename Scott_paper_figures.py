@@ -237,12 +237,12 @@ num_int_err_LXe=np.abs(1-P_int_LXe)*(y_specular_LXe/y_total_LXe)
 err_vac=np.sqrt(frac_err**2+num_int_err_vac**2)
 err_LXe=np.sqrt(frac_err**2+num_int_err_LXe**2)
 print(err_vac,err_LXe)
-plt.fill_between(x,y_total_LXe*(1-err_LXe),y_total_LXe*(1+err_LXe),alpha=0.1,facecolor='b')
-plt.fill_between(x,y_total_vacuum_s8*(1-err_vac),y_total_vacuum_s8*(1+err_vac),alpha=0.1,facecolor='b')
+#plt.fill_between(x,y_total_LXe*(1-err_LXe),y_total_LXe*(1+err_LXe),alpha=0.1,facecolor='b')
+#plt.fill_between(x,y_total_vacuum_s8*(1-err_vac),y_total_vacuum_s8*(1+err_vac),alpha=0.1,facecolor='b')
 # # Line styles: '-', '--', '-.', ':'
 
-plt.xlabel(r"Viewing angle $\theta_r$ (degrees)")
-plt.ylabel(r"Hemispherical reflectance $R(\theta_r)$")
+plt.xlabel(r"Incident angle $\theta_i$ (degrees)")
+plt.ylabel(r"Hemispherical reflectance $R(\theta_i)$")
 plt.legend(loc=(0.05,0.08))
 plt.ylim(0,1.1)
 

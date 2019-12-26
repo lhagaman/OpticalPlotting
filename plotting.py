@@ -116,7 +116,7 @@ def plot_gaussian_fit(run, mu=1000):
 #works with or without spike
 def plot_TSTR_fit(theta_i, n, fit_params, label="", color="", average_angle=0, precision=-1, sigma_theta_i=2.0, fit_text="Fit: ", fit_text_offset=0, phi_r=0, include_fit_text=True):
 	min_angle = 0
-	max_angle = 85
+	max_angle = 80
 	d_theta = 1
 	n_angles = (max_angle-min_angle)/d_theta+1
 	x = np.linspace(min_angle, max_angle, n_angles)

@@ -24,10 +24,9 @@ class Run:
 		# Have been using 70 for 1st/2nd run LXe data at 178 nm, 150 for vacuum data at 178/175 nm
 		self.incidentpower = float(lines[8][16:-1])
 		if are_you_scott:
-			beam_bkg_filename = "3rd Xenon Run Measurements\\Power and background at 178 nm\\2018_12_21__12_51_57.txt"
+			beam_bkg_filename = "First Xe Run Measurements\\first measurements with no bubbles in cell 11-01-2\\Initial power and background at 178 nm\\2018_11_01__14_56_35.txt"
 			#"2nd Xenon Run Measurements\\165 nm measurements\\Power and background measurements\\2018_12_06__11_15_32.txt"
 			#"2nd Xenon Run Measurements\\220 nm measurements\\Power and background measurements\\2018_12_06__15_02_43.txt"
-			#"First Xe Run Measurements\\first measurements with no bubbles in cell 11-01-2\\Initial power and background at 178 nm\\2018_11_01__14_56_35.txt"
 			#"2nd Xenon Run Measurements\\300 nm measurements\\Power and background measurements\\2018_12_06__16_23_26.txt"
 			#"2nd Xenon Run Measurements\\400 nm measurements\\Power and background measurements\\2018_12_06__17_33_50.txt"
 			#"3rd Xenon Run Measurements\\Power and background at 178 nm\\2018_12_21__12_51_57.txt" #background with beam on goes here 
@@ -42,16 +41,18 @@ class Run:
 		self.beam_bkg_angles = np.array([datum[0] for datum in beam_bkg_data])
 		self.beam_bkg_incidentpower = float(beam_bkg_lines[8][16:-1])
 		# dark_bkg_filename = "Vacuum measurements after 3rd xenon run/Jan 14/Background/no beam/2019_01_14__13_28_17.txt" #background with beam off goes here
-		# dark_bkg_file = open(dark_bkg_filename)
-		# dark_bkg_data = np.loadtxt(dark_bkg_filename,skiprows = 12)
+		dark_bkg_filename = "Vacuum measurements after 3rd xenon run\\Jan 9-12\\Background\\No beam\\2019_01_11__17_18_44.txt"
+		dark_bkg_file = open(dark_bkg_filename)
+		dark_bkg_data = np.loadtxt(dark_bkg_filename,skiprows = 12)
 		# self.dark_bkg_intensities = np.array([datum[1] for datum in dark_bkg_data])
 		# self.dark_bkg_angles = np.array([datum[0] for datum in dark_bkg_data])
-		self.dark_bkg_intensities=200
-		bkg_scaling=0.5
+		self.dark_bkg_intensities=60 # could try using a different dark bkg for subtraction (judging scaling of reflections) vs addition (judging true dark rate); relevant for Run2 where dark bkg may be different from that in bkg file from Run 1
+		bkg_scaling=1.5
 		bkg = (self.beam_bkg_intensities-self.dark_bkg_intensities)*(self.incidentpower/self.beam_bkg_incidentpower)*bkg_scaling +self.dark_bkg_intensities
-        #use above to subtract total background, with separate dark background and beam background scaled by bkg_scaling
-		#self.beam_bkg_intensities*(self.incidentpower/self.beam_bkg_incidentpower)		
-		#self.dark_bkg_intensities #use this to subtract background with beam off
+        #use above to subtract total background, with separate dark background and beam background scaled by bkg_scaling	
+		# self.beam_bkg_intensities*(self.incidentpower/self.beam_bkg_incidentpower)
+		# bkg = self.dark_bkg_intensities #use this to subtract background with beam off
+		# self.beam_bkg_angles=self.dark_bkg_angles
 		
 		self.angles = [datum[0] for datum in data]
 		self.incidentangle = float(lines[7][16:-1])
@@ -84,7 +85,7 @@ class Run:
 		self.temperature = float(lines[10][13:-1])
 		self.pressure = float(lines[11][10:-1])
 		self.relative_intensities = [intensity*intensity_factor(self.incidentpower) for intensity in self.intensities]
-		const_err = 100 # error to add to std from e.g. error on background; using 300 for 1st/2nd run LXe data at 178 nm, 100 for vacuum at 178/175 nm
+		const_err = 100 # error to add to std from e.g. error on background; using 100 for LXe data at 178 nm, 40 for vacuum at 178/175 nm
 		self.relative_std = [(std+const_err)*intensity_factor(self.incidentpower) for std in self.intensity_std]
 		frac_err = 0.05# fraction of each reading to add as an error in quadrature
 		self.std_pct = [frac_err*rel_int for rel_int in self.relative_intensities]
@@ -99,14 +100,14 @@ class Run:
 			# from https://arxiv.org/pdf/physics/0307044
 		
 		# this section changes the angle range
-		"""
-		angles_below_cutoff = np.where(np.array(self.angles) < 70.)
+		
+		angles_below_cutoff = np.where(np.array(self.angles) < 80)
 		self.angles = np.array(self.angles)[angles_below_cutoff]
 		self.intensities = np.array(self.intensities)[angles_below_cutoff]
 		self.intensity_std = np.array(self.intensity_std)[angles_below_cutoff]
 		self.relative_std = np.array(self.relative_std)[angles_below_cutoff]
 		self.relative_intensities = np.array(self.relative_intensities)[angles_below_cutoff]
-		"""
+		
 			
 		# independent_variables_array is a list where each element is of the form [theta_r_in_degrees, phi_r_in_degrees, theta_i_in_degrees, n_0, polarization]
 		self.independent_variables_array = [[angle, 0, self.incidentangle, self.n, 0.5] for angle in self.angles]
@@ -180,8 +181,9 @@ def intensity_factor(incidentpower):
 
 	# product of this and measured rate is (rate/str)/rate_i
 	# intensity_factor * rate = (rate / photodiode_solid_angle) / flux_i
-	intensity_correction = 1.0 # Corrects power measurement for light missing PMT; assumed to be the same for data and bkg measurements (i.e. does not affect scaling of bkg)
+	intensity_correction = 0.753 # Corrects power measurement for light missing PMT; assumed to be the same for data and bkg measurements (i.e. does not affect scaling of bkg)
 	# In LXe: 178nm - 75.3%; 165nm - 64.2%; 220nm - 85.6%; 300nm - 90.1%; 400nm - 90.9%
+	# In vacuum: 0.93133
 	intensity_factor = intensity_correction / (photodiode_solid_angle * incidentpower)
 	
 	return intensity_factor

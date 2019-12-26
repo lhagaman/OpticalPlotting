@@ -93,8 +93,8 @@ angle_shifts=angle_shifts_s9_lowp
 # self.beam_bkg_angles=self.dark_bkg_angles
 # Used sigma_theta_i=2 for fitting and wavelength_F = False in TSTR_fit_new.py
 # Angle range in file_reader is not cut off, stops at 85 in plot_TSTR_fit
-runs = [skived30, skived45, skived52, skived60, skived67, skived75]
-angle_shifts=angle_shifts_s9_vac
+#runs = [skived30, skived45, skived52, skived60, skived67, skived75]
+#angle_shifts=angle_shifts_s9_vac
 # Make sure n=1.0 for plotting below
 
 for run, angle in zip(runs, angle_shifts): run.change_theta_i(angle)
@@ -116,7 +116,7 @@ fit_params_s9_lowp_gauss_n= [0.7617591236933063, 1.581667834504223, 0.1096553934
 fit_params_s9_vac= [0.73367974544643089, 1.7043657376479024, 0.11826240150179418, 7.9564857778025644]
 fit_params_s8_lowp_gauss_n= [0.9144536241966592, 1.5793399801859325, 0.08088290783956979, 1.2565135586082907, 4.857675748475832]
 
-fit_params = fit_params_s9_vac
+fit_params = fit_params_s9_lowp_gauss_n
 
 
 print("Fit parameters (rho_L, n, gamma): "+str(fit_params))
@@ -130,8 +130,8 @@ n_LXe_220 = 1.5044552
 n_LXe_300 = 1.42975267
 n_LXe_400 = 1.404459446
 n_LXe = n_LXe_178
-n=1.0
-# n=n_LXe
+# n=1.0
+n=n_LXe
 
 plt.xlim(0,85)
 plt.ylim(1e-3,1e2)
@@ -142,11 +142,11 @@ colors=[plt.cm.plasma(i) for i in np.linspace(0.2,0.90,len(runs))]
 # colors=[cmap(i) for i in np.linspace(0,1,len(runs))] 
 label_x=[0.63,0.93,0.88,0.85,0.9,0.88] # Positions for s9 low_p
 label_y=[0.27,0.31,0.45,0.63,0.75,0.88]
-label_x=[0.25,0.45,0.55,0.65,0.75,0.85] # Positions for s9 in vacuum
-label_y=[0.6,0.62,0.65,0.7,0.76,0.85]
+#label_x=[0.25,0.45,0.55,0.65,0.75,0.85] # Positions for s9 in vacuum
+#label_y=[0.6,0.62,0.65,0.7,0.76,0.85]
 angle_labels=[r"$\theta_i=30^{\circ}$",r"$45^{\circ}$",r"$52^{\circ}$",r"$60^{\circ}$",r"$67^{\circ}$",r"$75^{\circ}$"]
 for ii in range(len(angle_shifts)):
-	plot_TSTR_fit(angle_shifts[ii], n, fit_params, color=colors[ii], label=None, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i)
+	plot_TSTR_fit(angle_shifts[ii], n, fit_params, color=colors[ii], label=None, average_angle=average_angle, precision=precision, sigma_theta_i=sigma_theta_i, include_fit_text=False)
 	plt.text(label_x[ii], label_y[ii], angle_labels[ii],transform=plt.gca().transAxes,fontsize=13,color=colors[ii])
 	
 
